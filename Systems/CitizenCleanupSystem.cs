@@ -1,23 +1,24 @@
 // CitizenCleanupSystem.cs
+using System;
 using Colossal.Logging;
-using Game.Citizens;        // HouseholdMember
-using Game.Common;          // for Deleted
-using Unity.Collections;    // for NativeList
-using Unity.Entities;       // Entity, SystemBase, ComponentType, EntityQuery, etc.
-
+using Game;
+using Game.Citizens;
+using Game.Common;
+using Game.Tools;
+using Unity.Collections;
+using Unity.Entities;
 
 namespace CitizenCleaner
 {
     /// <summary>
-    /// ECS System for cleanup of citizen entities triggered via UI
+    /// Cleans citizen entities only when requested from the Options UI.
     /// </summary>
-    public partial class CitizenCleanupSystem : SystemBase
+    public partial class CitizenCleanupSystem : GameSystemBase
     {
         private static readonly ILog s_Log = Mod.log;
 
-        #region Types / Bookkeeping
-        // Selection bookkeeping (category + tallies)
         private enum CleanupType { None, Corrupt, Homeless, Commuters, MovingAway }
+
         private struct DeletionCounts
         {
             public int Corrupt, Homeless, Commuters, MovingAway;
@@ -30,106 +31,130 @@ namespace CitizenCleaner
                     case CleanupType.Homeless: Homeless++; break;
                     case CleanupType.Commuters: Commuters++; break;
                     case CleanupType.MovingAway: MovingAway++; break;
-                    case CleanupType.None:        /* no-op */    break;
+                    case CleanupType.None: break;
                 }
             }
         }
-        #endregion
 
-        #region Fields
-        // ---- State, queries ----
         private DeletionCounts m_lastCounts;
-        private float m_lastProgressNotified = -1f;   // UI progress throttle (~5% steps)
-        private bool m_shouldRunCleanup = false;    // Flag to trigger cleanup operation
-
-        // Chunked cleanup state
+        private float m_lastProgressNotified = -1f;
+        private bool m_shouldRunCleanup;
         private NativeList<Entity> m_entitiesToCleanup;
-        private int m_cleanupIndex = 0;
-        private bool m_isChunkedCleanupInProgress = false;
-
-        // Cached query for reuse
+        private int m_cleanupIndex;
+        private bool m_isChunkedCleanupInProgress;
         private EntityQuery m_householdMemberQuery;
+        private EntityQuery m_householdQuery;
+        private CCSetting? m_settings;
 
-        // Settings
-        private Setting? m_settings;
-        #endregion
+        public event Action<float>? OnCleanupProgress;
+        public event Action? OnCleanupCompleted;
+        public event Action? OnCleanupNoWork;
 
-        #region Events
-        // Callback for when cleanup is in progress and completed
-        public event System.Action<float>? OnCleanupProgress;
-        public event System.Action? OnCleanupCompleted;
-        public event System.Action? OnCleanupNoWork;
-        #endregion
-
-
-        /// <summary>
-        /// Setup queries and log creation
-        /// </summary>
         protected override void OnCreate()
         {
-            m_householdMemberQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[] { ComponentType.ReadOnly<HouseholdMember>() },
-                None = new[] { ComponentType.ReadOnly<Deleted>() }
-            });
-
             base.OnCreate();
 
-            s_Log.Info("CitizenCleanupSystem created");
+            m_householdMemberQuery = SystemAPI.QueryBuilder()
+                .WithAll<HouseholdMember>()
+                .WithNone<Deleted>()
+                .Build();
+
+            m_householdQuery = SystemAPI.QueryBuilder()
+                .WithAll<Household, HouseholdCitizen>()
+                .WithNone<Deleted, Temp>()
+                .Build();
+
+            // The UI enables this system only while a cleanup is running.
+            Enabled = false;
         }
 
-        // Non-blocking: process one chunk if run is active, otherwise start a run if requested
         protected override void OnUpdate()
         {
-            // If nothing active & nothing requested, do nothing this frame
-            if (!m_isChunkedCleanupInProgress && !m_shouldRunCleanup)
-                return;
-
-            // Handle chunked cleanup if in progress, otherwise fallback to boolean flag
             if (m_isChunkedCleanupInProgress)
             {
                 ProcessCleanupChunk();
                 return;
             }
 
-            // Start new cleanup run: requested via TriggerCleanup. Clear request flag, log it, initialize chunked workflow.
-            m_shouldRunCleanup = false;
-            StartChunkedCleanup();
+            if (m_shouldRunCleanup)
+            {
+                m_shouldRunCleanup = false;
+                StartChunkedCleanup();
+                return;
+            }
+
+            Enabled = false;
         }
 
-        #region Public API
-        /// <summary>
-        /// Sets the settings reference for filtering
-        /// </summary>
-        public void SetSettings(Setting settings)
+        protected override void OnGamePreload(
+            Colossal.Serialization.Entities.Purpose purpose,
+            GameMode mode)
+        {
+            base.OnGamePreload(purpose, mode);
+
+            if (mode != GameMode.Game ||
+                (purpose != Colossal.Serialization.Entities.Purpose.NewGame &&
+                 purpose != Colossal.Serialization.Entities.Purpose.LoadGame))
+            {
+                return;
+            }
+
+            // Never carry a deletion list into another city.
+            if (m_entitiesToCleanup.IsCreated)
+            {
+                m_entitiesToCleanup.Dispose();
+                m_entitiesToCleanup = default;
+            }
+
+            m_shouldRunCleanup = false;
+            m_isChunkedCleanupInProgress = false;
+            m_cleanupIndex = 0;
+            m_lastProgressNotified = -1f;
+            m_lastCounts = default;
+            Enabled = false;
+        }
+
+        protected override void OnGameLoadingComplete(
+            Colossal.Serialization.Entities.Purpose purpose,
+            GameMode mode)
+        {
+            base.OnGameLoadingComplete(purpose, mode);
+
+            if (mode == GameMode.Game &&
+                (purpose == Colossal.Serialization.Entities.Purpose.NewGame ||
+                 purpose == Colossal.Serialization.Entities.Purpose.LoadGame))
+            {
+                m_settings?.InvalidateCitySnapshot();
+            }
+        }
+
+        public void SetSettings(CCSetting settings)
         {
             m_settings = settings;
         }
 
-        /// <summary>
-        /// Triggers the cleanup operation to run on the next update
-        /// </summary>
         public void TriggerCleanup()
         {
-#if DEBUG
-            s_Log.Debug("[Cleanup] trigger request (from Settings UI)");
-#endif
+            if (m_shouldRunCleanup || m_isChunkedCleanupInProgress)
+                return;
+
             m_shouldRunCleanup = true;
+            Enabled = true;
+
+#if DEBUG
+            s_Log.Debug("[Cleanup] Triggered from the Options UI.");
+#endif
         }
 
-        /// <summary>
-        /// Gets citizen statistics for display
-        /// </summary>
         public (int totalCitizens, int citizensToClean) GetCitizenStatistics()
         {
             try
             {
-                var totalCitizens = m_householdMemberQuery.CalculateEntityCount();
-                var citizensToClean = GetCitizensToCleanCount();
-
+                int totalCitizens = m_householdMemberQuery.CalculateEntityCount();
+                int citizensToClean = GetCitizensToCleanCount();
                 return (totalCitizens, citizensToClean);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 s_Log.Warn($"Error getting citizen statistics: {ex.Message}");
                 return (0, 0);
@@ -140,37 +165,21 @@ namespace CitizenCleaner
         {
             try
             {
-                // Cheap test for City Loaded: true when there is at least one household member
-                var hasAny = !m_householdMemberQuery.IsEmptyIgnoreFilter;
-#if DEBUG
-        s_Log.Debug($"[HasAnyCitizenData] any household members? {hasAny}");
-#endif
-                return hasAny;
+                return !m_householdMemberQuery.IsEmptyIgnoreFilter;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-#if DEBUG
-        s_Log.Debug($"[HasAnyCitizenData] Exception: {ex.GetType().Name}: {ex.Message}");
-#else
-                // In release, ex isn't used (no debug log). Assign to discard to avoid CS0168.
-                _ = ex; // intentionally unused
-#endif
-                return false; // if city not loaded or query not available yet
+                s_Log.Warn($"Unable to check citizen data: {ex.Message}");
+                return false;
             }
         }
-
-
-        #endregion
 
         protected override void OnDestroy()
         {
             if (m_entitiesToCleanup.IsCreated)
-            {
                 m_entitiesToCleanup.Dispose();
-            }
-            s_Log.Info("CitizenCleanupSystem destroyed");
-            base.OnDestroy();
 
+            base.OnDestroy();
         }
     }
 }

@@ -1,4 +1,4 @@
-// CitzenCleanupSystem.Apply.cs
+// CitizenCleanupSystem.Apply.cs
 using Game.Common;          // Deleted
 using Unity.Collections;    // Allocator
 using Unity.Entities;
@@ -7,7 +7,7 @@ using Unity.Mathematics;    // math
 namespace CitizenCleaner
 {
     // PART: Apply (write-side) — starts chunked runs, mark chunks, throttle progress, signal completion
-    public partial class CitizenCleanupSystem : SystemBase
+    public partial class CitizenCleanupSystem
     {
         // ---- constants ----
         private const int CLEANUP_CHUNK_SIZE = 2000;   // entities to mark per frame
@@ -34,9 +34,9 @@ namespace CitizenCleaner
             {
                 s_Log.Info("Cleanup requested, but nothing matched the selected filters.");
                 if (m_entitiesToCleanup.IsCreated) m_entitiesToCleanup.Dispose();
-                m_isChunkedCleanupInProgress = false;
 
                 OnCleanupNoWork?.Invoke();
+                Enabled = false;
                 return;
             }
 
@@ -107,6 +107,7 @@ namespace CitizenCleaner
             m_cleanupIndex = 0;
             m_lastProgressNotified = -1f;    // UI throttle reset
             m_lastCounts = default;
+            Enabled = false;
 
             s_Log.Info("Cleanup complete.");   // closing line
         }

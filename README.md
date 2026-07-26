@@ -38,8 +38,8 @@ Everything is Optional ✅
 - Safe to remove anytime
 
 ℹ️ **Localization Support**
-- English, 简体中文 (Simplified Chinese), Français, Deutsch, Español, Italiano
-- 日本語, 한국어, Tiếng Việt, Português brasileiro.
+- English, 简体中文 (Simplified Chinese), 繁體中文 (Traditional Chinese), Polski
+- Français, Deutsch, Español, Italiano, 日本語, 한국어, Tiếng Việt, Português brasileiro.
 
 
 ## Usage
@@ -74,7 +74,7 @@ Not sure. It could be another mod or something introduced in a more recent patch
 - phillycheeze - mod author
 - yenyang - feedback, coop development
 - Honu - testing, PR/coop development 
-  - locale support (EN, DE,ES,FR,IT,JA,KO,PT,VI,ZH_CN)
+  - locale support (EN, DE,ES,FR,IT,JA,KO,PL,PT,VI,ZH_CN,ZH_HANT)
 - Konsi - feedback
 - krzychu124 - feedback, code sharing
 - Noel - ZH_CN locale review
