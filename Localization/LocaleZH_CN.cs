@@ -23,10 +23,12 @@ namespace CitizenCleaner
                 // Tabs
                 { m_Setting.GetOptionTabLocaleID(Setting.kSection), "操作" },
                 { m_Setting.GetOptionTabLocaleID(Setting.AboutTab), "关于" },
+                { m_Setting.GetOptionTabLocaleID(Setting.DebugTab), "调试" },
 
                 // Groups
                 { m_Setting.GetOptionGroupLocaleID(Setting.kFiltersGroup), "清理目标" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.kButtonGroup), "操作" },
+                { m_Setting.GetOptionGroupLocaleID(Setting.StatusGroup), "Citizen & Vehicle Status" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.InfoGroup), "信息" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.DebugGroup), "调试" },
 
@@ -69,19 +71,16 @@ namespace CitizenCleaner
                   "更新所有实体计数以显示当前城市统计。\n" +
                   "清理后请让游戏继续运行一段时间。" },
 
-                // Debug preview (add missing)
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.LogCorruptPreviewButton)), "日志 - 损坏 ID（前 10 个）" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.LogCorruptPreviewButton)),
-                  "— 将前 25 个损坏市民的 ID **（Index:Version）** 写入日志，便于在 Scene Explorer 中核对。\n\n" +
-                  "- **仅预览** — 不会删除任何内容。\n\n" +
-                  "- 日志文件：\n" +
-                  "%USERPROFILE%/AppData/LocalLow/Colossal Order/Cities Skylines II/logs/CitizenCleaner.log" },
+                // Read-only diagnostic report
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.LogDiagnosticReportButton)), "将诊断报告写入日志" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.LogDiagnosticReportButton)),
+                  "写入易读报告：25 个损坏市民 ID，以及搬离中、通勤者和无家可归者各 10 个 ID；还包括市民计数和车辆状态。\n\n" +
+                  "**只读** — 不会删除任何内容。" },
 
 
                 // Sentence UNDER the button (multiline)
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.DebugCorruptNote)),
-                  "调试用：日志示例列表 — 不删除任何内容。\n" +
-                  "把前 25 个损坏实体的 ID 写入日志。" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.DebugReportNote)),
+                  "一个按钮写入完整诊断报告。不会删除任何内容。" },
 
 
                 // Displays
@@ -102,6 +101,26 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(Setting.CorruptedCitizensDisplay)),
                   "当你点击 **[清理]** 时将要移除的市民数量，\n\n" +
                   "基于你在上方勾选的选项 [ ✓ ]。" },
+
+                // New status rows (English fallback until this locale is translated)
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.CitizenCountComparisonDisplay)), "Citizen Count Comparison" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.PersonalCarStatusDisplay)), "Personal Cars" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.PersonalCarParkingDisplay)), "Personal-Car Parking" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OutsideConnectionOwnerDisplay)), "OC-Hidden Car Owners" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OutsideConnectionStageDisplay)), "OC-Hidden Staging Evidence" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.BicycleStatusDisplay)), "Bicycles" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.BicycleParkingDisplay)), "Bicycle Parking" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.VehicleOwnershipDisplay)), "Potential Orphans" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.VehicleSnapshotTimeDisplay)), "Updated" },
+                { "CitizenCleaner/Status/CitizenCountRow", "CC household-member entities {0} | game valid moved-in citizens {1} | difference {2}" },
+                { "CitizenCleaner/Status/CarSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
+                { "CitizenCleaner/Status/CarParkingRow", "Street {0} | building/parking facility {1} (hidden {2}) | OC hidden {3} | other {4} (hidden {5})" },
+                { "CitizenCleaner/Status/OcHiddenOwnerRow", "City household {0} | owner at OC {1} | nonresident/moving {2} | missing/non-household {3} | broken backlink {4}" },
+                { "CitizenCleaner/Status/OcHiddenStageRow", "OC evidence: parked lane {0} | TripSource {1} | TripSource with no lane {2} | HomeTarget {3} | keeper at OC {4}" },
+                { "CitizenCleaner/Status/BicycleSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
+                { "CitizenCleaner/Status/BicycleParkingRow", "Visible parked {0} | OC hidden {1} | hidden elsewhere {2}" },
+                { "CitizenCleaner/Status/OwnershipRow", "Ownership mismatches: personal cars {0} | bicycles {1}" },
+                { "CitizenCleaner/Status/CapturedAtRow", "Snapshot time {0}" },
 
                 // Prompts (used by Setting.cs for placeholder text)
                 { "CitizenCleaner/Prompt/RefreshCounts", "点击 [刷新计数]" },

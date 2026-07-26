@@ -22,10 +22,10 @@ namespace CitizenCleaner
     /// Settings UI attributes and backing fields
     /// </summary>
     [SettingsUITabOrder(MainTab, AboutTab, DebugTab)]
-    [SettingsUIGroupOrder(kFiltersGroup, kButtonGroup, InfoGroup, UsageGroup, DebugGroup)]
-    [SettingsUIShowGroupName(kFiltersGroup, kButtonGroup, DebugGroup)]  // InfoGroup + UsageGroup header omitted on purpose.
+    [SettingsUIGroupOrder(kFiltersGroup, kButtonGroup, StatusGroup, InfoGroup, UsageGroup, DebugGroup)]
+    [SettingsUIShowGroupName(kFiltersGroup, kButtonGroup, StatusGroup, DebugGroup)]  // InfoGroup + UsageGroup header omitted on purpose.
 
-    public class Setting : ModSetting
+    public partial class Setting : ModSetting
     {
         #region UI Structure
         // ---- UI structure ----
@@ -37,6 +37,7 @@ namespace CitizenCleaner
         public const string UsageGroup = "Usage";    //About tab section for usage instructions
         public const string kButtonGroup = "Button";
         public const string kFiltersGroup = "Filters";
+        public const string StatusGroup = "VehicleStatus";
         public const string DebugGroup = "Debug";
         #endregion
 
@@ -271,7 +272,7 @@ namespace CitizenCleaner
         // ---- Debug button ----
         [SettingsUIButton]
         [SettingsUISection(DebugTab, DebugGroup)]
-        public bool LogCorruptPreviewButton
+        public bool LogDiagnosticReportButton
         {
             set
             {
@@ -288,17 +289,18 @@ namespace CitizenCleaner
                     return;
                 }
 
-                // Preview: logs up to 25 Corrupt citizen IDs (Index:Version)
-                // Method logs exactly one line:
-                //  - "[Preview] Corrupt …" when there are matches
-                //  - "[Preview] No Corrupt citizens found with current city data." when none
-                Mod.CleanupSystem.LogCorruptPreviewToLog(25);
+                // One read-only report:
+                //  - 25 corrupt citizen IDs
+                //  - 10 moving-away, commuter, and homeless citizen IDs each
+                //  - official 1.6.0 citizen counters
+                //  - personal-car and bicycle status
+                Mod.CleanupSystem.LogDiagnosticReportToLog();
             }
         }
 
         [SettingsUIMultilineText]
         [SettingsUISection(DebugTab, DebugGroup)]
-        public string DebugCorruptNote => string.Empty;
+        public string DebugReportNote => string.Empty;
         #endregion
 
         // OpenLog button
@@ -464,6 +466,7 @@ namespace CitizenCleaner
             _showRefreshPrompt = true;   // show prompt until refreshed
             _showNoCity = false;
             _showError = false;
+            ResetVehicleStatus();
         }
         #endregion
 
@@ -488,6 +491,7 @@ namespace CitizenCleaner
                         _cleanupStatus = "Idle";
 
                     _showRefreshPrompt = false; // show "No city" message, not the Refresh prompt
+                    ResetVehicleStatus(noCity: true);
                     Apply();    // early return, nothing to do
                     return;
                 }
@@ -500,6 +504,7 @@ namespace CitizenCleaner
 
                 _totalCitizens = $"{totalCitizens:N0}";
                 _corruptedCitizens = $"{citizensToClean:N0}";
+                RefreshVehicleStatus();
 
                 // Don’t overwrite "Complete" immediately after a cleanup; keep it until filters change or a new cleanup runs.
                 if (!_isCleanupInProgress && _cleanupStatus != "Complete")
@@ -522,6 +527,7 @@ namespace CitizenCleaner
                 _totalCitizens = string.Empty;      // do not cache translated text
                 _corruptedCitizens = string.Empty;  // do not cache translated text
                 _showRefreshPrompt = false;         // show error, not Refresh prompt
+                ResetVehicleStatus(error: true);
             }
 
 

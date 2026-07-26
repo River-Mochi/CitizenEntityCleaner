@@ -41,6 +41,7 @@ namespace CitizenCleaner
 
         private Setting? m_Setting;     // nullable; assigned in OnLoad
         public static CitizenCleanupSystem? CleanupSystem { get; private set; } // nullable; assigned in OnLoad
+        public static CitizenVehicleStatusSystem? VehicleStatusSystem { get; private set; }
 
         // Keep same delegate instances and use for both += and -= so -= works (ensures unsubscribe works).
         private Action<float>? _onProgress;
@@ -124,6 +125,8 @@ namespace CitizenCleaner
             updateSystem.UpdateAt<CitizenCleanupSystem>(SystemUpdatePhase.Modification1);
             CleanupSystem = updateSystem.World.GetOrCreateSystemManaged<CitizenCleanupSystem>();
             CleanupSystem.SetSettings(m_Setting);
+            VehicleStatusSystem =
+                updateSystem.World.GetOrCreateSystemManaged<CitizenVehicleStatusSystem>();
 
             // Progress / completion callbacks
             _onProgress = m_Setting.UpdateCleanupProgress;
@@ -135,7 +138,7 @@ namespace CitizenCleaner
             CleanupSystem.OnCleanupCompleted += _onCompleted;
             CleanupSystem.OnCleanupNoWork += _onNoWork;
 
-            log.Info("CitizenCleanupSystem registered");
+            log.Info("CitizenCleanupSystem registered; on-demand vehicle status initialized");
         }
 
         public void OnDispose()
@@ -182,6 +185,7 @@ namespace CitizenCleaner
                 _onNoWork = null;
 
                 CleanupSystem = null;
+                VehicleStatusSystem = null;
                 m_Setting = null;
             }
         }

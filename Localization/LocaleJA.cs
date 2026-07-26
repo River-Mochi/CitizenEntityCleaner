@@ -23,10 +23,12 @@ namespace CitizenCleaner
                 // Tabs
                 { m_Setting.GetOptionTabLocaleID(Setting.kSection), "アクション" },
                 { m_Setting.GetOptionTabLocaleID(Setting.AboutTab), "概要" },
+                { m_Setting.GetOptionTabLocaleID(Setting.DebugTab), "デバッグ" },
 
                 // Groups
                 { m_Setting.GetOptionGroupLocaleID(Setting.kFiltersGroup), "クリーンアップ対象" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.kButtonGroup), "アクション" },
+                { m_Setting.GetOptionGroupLocaleID(Setting.StatusGroup), "Citizen & Vehicle Status" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.InfoGroup), "情報" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.DebugGroup), "デバッグ" },
 
@@ -69,19 +71,16 @@ namespace CitizenCleaner
                   "すべてのエンティティ数を更新し、現状の統計を表示します。\n" +
                   "クリーンアップ後は、ゲームを一時停止せずにしばらく動かしてください。" },
 
-                // Debug preview - logs a sample list of corrupt citizens
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.LogCorruptPreviewButton)), "ログ - 破損ID（最初の10件）" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.LogCorruptPreviewButton)),
-                  "- 最初の **25 件の破損した市民 ID** をログファイルに **(Index:Version)** 形式で追加します（Scene Explorer で照合）。\n\n" +
-                  "- **プレビューのみ** — 何も削除しません。\n\n" +
-                  "- ログファイルの場所:\n" +
-                  "%USERPROFILE%/AppData/LocalLow/Colossal Order/Cities Skylines II/logs/CitizenCleaner.log" },
+                // Read-only diagnostic report
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.LogDiagnosticReportButton)), "診断レポートをログに出力" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.LogDiagnosticReportButton)),
+                  "破損市民25件、転出中・通勤者・ホームレス各10件のIDと、市民数・車両状態を読みやすいレポートにします。\n\n" +
+                  "**読み取り専用** — 何も削除しません。" },
 
                 // Sentence UNDER the button (multiline text row)
                 // LabelLocale = inline body under the button
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.DebugCorruptNote)),
-                  "デバッグ用途：サンプル一覧をログ出力 — 何も削除しません。\n" +
-                  "破損エンティティの最初の25件のIDをログに列挙します。" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.DebugReportNote)),
+                  "1つのボタンで完全な診断レポートを出力します。何も削除しません。" },
 
                 // Displays
                 { m_Setting.GetOptionLabelLocaleID(nameof(Setting.CleanupStatusDisplay)), "ステータス" },
@@ -101,6 +100,26 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(Setting.CorruptedCitizensDisplay)),
                   "「**クリーンアップ**」をクリックした際に削除される市民エンティティ数。\n\n" +
                   "選択したチェックボックス [ ✓ ] に基づきます。" },
+
+                // New status rows (English fallback until this locale is translated)
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.CitizenCountComparisonDisplay)), "Citizen Count Comparison" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.PersonalCarStatusDisplay)), "Personal Cars" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.PersonalCarParkingDisplay)), "Personal-Car Parking" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OutsideConnectionOwnerDisplay)), "OC-Hidden Car Owners" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OutsideConnectionStageDisplay)), "OC-Hidden Staging Evidence" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.BicycleStatusDisplay)), "Bicycles" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.BicycleParkingDisplay)), "Bicycle Parking" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.VehicleOwnershipDisplay)), "Potential Orphans" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.VehicleSnapshotTimeDisplay)), "Updated" },
+                { "CitizenCleaner/Status/CitizenCountRow", "CC household-member entities {0} | game valid moved-in citizens {1} | difference {2}" },
+                { "CitizenCleaner/Status/CarSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
+                { "CitizenCleaner/Status/CarParkingRow", "Street {0} | building/parking facility {1} (hidden {2}) | OC hidden {3} | other {4} (hidden {5})" },
+                { "CitizenCleaner/Status/OcHiddenOwnerRow", "City household {0} | owner at OC {1} | nonresident/moving {2} | missing/non-household {3} | broken backlink {4}" },
+                { "CitizenCleaner/Status/OcHiddenStageRow", "OC evidence: parked lane {0} | TripSource {1} | TripSource with no lane {2} | HomeTarget {3} | keeper at OC {4}" },
+                { "CitizenCleaner/Status/BicycleSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
+                { "CitizenCleaner/Status/BicycleParkingRow", "Visible parked {0} | OC hidden {1} | hidden elsewhere {2}" },
+                { "CitizenCleaner/Status/OwnershipRow", "Ownership mismatches: personal cars {0} | bicycles {1}" },
+                { "CitizenCleaner/Status/CapturedAtRow", "Snapshot time {0}" },
 
                 // Prompts (used by Setting.cs for placeholder text)
                 { "CitizenCleaner/Prompt/RefreshCounts", "[カウントを更新] をクリック" },

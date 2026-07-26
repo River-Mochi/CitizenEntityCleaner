@@ -1,5 +1,4 @@
 // CitizenCleanupSystem.Scan.cs
-using System.Text;
 using Game.Agents;
 using Game.Buildings;
 using Game.Citizens;
@@ -16,7 +15,7 @@ namespace CitizenCleaner
         #region Selection Logic
         /// <summary>
         /// Builds deletion set based on toggles (or overrides for debug preview):
-        /// - Corrupt households (no PropertyRenter & not homeless/commuter/tourist) - excludes members who are Moving-Away
+        /// - Corrupt households (no PropertyRenter & not homeless/commuter/tourist/moving-away)
         /// - HomelessHousehold members when IncludeHomeless == true
         /// - CommuterHousehold members when IncludeCommuters == true
         /// - Moving-Away (no PropertyRenter) when IncludeMovingAwayNoPR == true
@@ -72,16 +71,25 @@ namespace CitizenCleaner
                     var isHomelessHH = EntityManager.HasComponent<HomelessHousehold>(householdEntity);
                     var isCommuterHH = EntityManager.HasComponent<CommuterHousehold>(householdEntity);
                     var isTouristHH = EntityManager.HasComponent<TouristHousehold>(householdEntity);
+                    var isMovingAwayHH = EntityManager.HasComponent<MovingAway>(householdEntity);
 
-                    // Quick HH-level skip optimization: if nothing in this HH could match
-                    // and the independent Moving-Away rule is OFF, skip members.
-                    var isResidentCorrupt = !hasPropertyRenter && !isHomelessHH && !isCommuterHH && !isTouristHH;
+                    // MovingAway belongs to the household in the game. Treating it as a citizen
+                    // component can split and delete a legitimate household before every member
+                    // has started an individual MovingAway trip.
+                    var isResidentCorrupt =
+                        !hasPropertyRenter &&
+                        !isHomelessHH &&
+                        !isCommuterHH &&
+                        !isTouristHH &&
+                        !isMovingAwayHH;
+
                     var householdMatchesAny =
                         (wantHomeless && isHomelessHH) ||
                         (wantCommuters && isCommuterHH) ||
-                        (wantCorrupt && isResidentCorrupt);
+                        (wantCorrupt && isResidentCorrupt) ||
+                        (wantMovingAwayNoPR && isMovingAwayHH && !hasPropertyRenter);
 
-                    if (!householdMatchesAny && !wantMovingAwayNoPR)
+                    if (!householdMatchesAny)
                         continue;
 
                     // Iterate members and apply per-citizen rules (via shared classifier)
@@ -94,8 +102,8 @@ namespace CitizenCleaner
 
                         CleanupType reason = ClassifyCitizenForDeletion(
                             wantCorrupt, wantHomeless, wantCommuters, wantMovingAwayNoPR,
-                            isHomelessHH, isCommuterHH, isTouristHH, hasPropertyRenter,
-                            citizenEntity);
+                            isHomelessHH, isCommuterHH, isTouristHH, isMovingAwayHH,
+                            hasPropertyRenter);
 
                         if (reason != CleanupType.None)
                         {
@@ -126,42 +134,6 @@ namespace CitizenCleaner
         }
         #endregion
 
-        #region Debug Helpers
-        // ---- Debug Log: preview only, no delete ----
-        public void LogCorruptPreviewToLog(int max)
-        {
-            if (max <= 0) return;
-
-            // Reuse the same traversal, force Corrupt=true and others=false; no state changes.
-            using NativeList<Entity> candidates = GetDeletionCandidates(
-                Allocator.TempJob,
-                tally: false,
-                overrideWantCorrupt: true,
-                overrideWantHomeless: false,
-                overrideWantCommuters: false,
-                overrideWantMovingAwayNoPR: false);
-
-            var count = math.min(max, candidates.Length);
-            if (count <= 0)
-            {
-                s_Log.Info("[Preview] No Corrupt citizens found with the current city data.");
-                return;
-            }
-
-            s_Log.Info($"[Preview] ==== Corrupt sample (up to {count}) ====");
-
-            var sb = new StringBuilder();
-            for (var i = 0; i < count; i++)
-            {
-                if (i > 0) sb.Append(", ");
-                sb.Append("Corrupt ").Append(FormatIndexVersion(candidates[i]));
-            }
-
-            s_Log.Info($"[Preview] {sb}");
-        }
-
-        #endregion
-
         #region Helpers
         // Resolve boolean: precedence: override → UI setting → fallback default.
         // Example: ResolveToggle(forced:true,  setting:false, fallback:false) => true
@@ -176,25 +148,6 @@ namespace CitizenCleaner
         private static string FormatIndexVersion(Entity e) => $"{e.Index}:{e.Version}";
 
 
-        // Returns true if the citizen is in a Moving-Away state.
-        // Checks the tag component first; falls back to TravelPurpose if present.
-        private bool IsMovingAway(Entity citizenEntity)
-        {
-            // Primary
-            if (EntityManager.HasComponent<MovingAway>(citizenEntity))
-                return true;
-
-            // Fallback
-            if (EntityManager.HasComponent<TravelPurpose>(citizenEntity))
-            {
-                TravelPurpose tp = EntityManager.GetComponentData<TravelPurpose>(citizenEntity);
-                if (tp.m_Purpose == Purpose.MovingAway)
-                    return true;
-            }
-
-            return false;
-        }
-
         private CleanupType ClassifyCitizenForDeletion(
             bool wantCorrupt,
             bool wantHomeless,
@@ -203,22 +156,23 @@ namespace CitizenCleaner
             bool isHomelessHH,
             bool isCommuterHH,
             bool isTouristHH,
-            bool hasPropertyRenter,
-            Entity citizenEntity)
+            bool isMovingAwayHH,
+            bool hasPropertyRenter)
         {
-            var movingAway = IsMovingAway(citizenEntity);
-
-            // Precedence: Homeless → Commuters → Corrupt, then independent Moving-Away (no PR)
+            // Precedence: Homeless → Commuters → Moving-Away → Corrupt.
             if (wantHomeless && isHomelessHH) return CleanupType.Homeless;
             if (wantCommuters && isCommuterHH) return CleanupType.Commuters;
+            if (wantMovingAwayNoPR && isMovingAwayHH && !hasPropertyRenter) return CleanupType.MovingAway;
 
-            if (wantCorrupt && !hasPropertyRenter && !isHomelessHH && !isCommuterHH && !isTouristHH)
+            if (wantCorrupt &&
+                !hasPropertyRenter &&
+                !isHomelessHH &&
+                !isCommuterHH &&
+                !isTouristHH &&
+                !isMovingAwayHH)
             {
-                // Skip corrupt if the person is Moving-Away
-                if (!movingAway) return CleanupType.Corrupt;
+                return CleanupType.Corrupt;
             }
-
-            if (wantMovingAwayNoPR && movingAway && !hasPropertyRenter) return CleanupType.MovingAway;
 
             return CleanupType.None;
         }

@@ -23,10 +23,12 @@ namespace CitizenCleaner
                 // Tabs
                 { m_Setting.GetOptionTabLocaleID(Setting.kSection), "Aktionen" },
                 { m_Setting.GetOptionTabLocaleID(Setting.AboutTab), "Über" },
+                { m_Setting.GetOptionTabLocaleID(Setting.DebugTab), "Debug" },
 
                 // Groups
                 { m_Setting.GetOptionGroupLocaleID(Setting.kFiltersGroup), "Aufräumziele" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.kButtonGroup), "Aktionen" },
+                { m_Setting.GetOptionGroupLocaleID(Setting.StatusGroup), "Citizen & Vehicle Status" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.InfoGroup), "Info" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.DebugGroup), "Debug" },
 
@@ -69,19 +71,16 @@ namespace CitizenCleaner
                   "Aktualisiert alle Zähler, um die aktuellen Stadtstatistiken anzuzeigen.\n" +
                   "Lasse das Spiel nach dem Bereinigen eine Minute lang unpausiert laufen." },
 
-                // Debug preview
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.LogCorruptPreviewButton)), "LOG - Korrupte IDs (erste 10)" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.LogCorruptPreviewButton)),
-                  "- Schreibt die ersten 25 IDs korrupter Bürger **(Index:Version)** ins Log zur Kontrolle im Scene Explorer.\n\n" +
-                  "- **Nur Vorschau** — es wird nichts gelöscht.\n\n" +
-                  "- Log-Datei:\n" +
-                  "%USERPROFILE%/AppData/LocalLow/Colossal Order/Cities Skylines II/logs/CitizenCleaner.log" },
+                // Read-only diagnostic report
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.LogDiagnosticReportButton)), "Diagnosebericht ins Log schreiben" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.LogDiagnosticReportButton)),
+                  "Schreibt einen lesbaren Bericht: 25 korrupte IDs sowie je 10 IDs für Wegziehende, Pendler und Obdachlose; außerdem Bürger- und Fahrzeugstatus.\n\n" +
+                  "**Nur Lesen** — es wird nichts gelöscht." },
 
 
                 // Sentence UNDER the button (multiline)
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.DebugCorruptNote)),
-                  "Debug: Log-Beispielliste — es wird nichts gelöscht.\n" +
-                  "Schreibt die ersten 25 IDs korrupter Entitäten ins Log." },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.DebugReportNote)),
+                  "Eine Schaltfläche schreibt den vollständigen Fehlerbericht. Es wird nichts gelöscht." },
 
                 // Displays
                 { m_Setting.GetOptionLabelLocaleID(nameof(Setting.CleanupStatusDisplay)), "Status" },
@@ -101,6 +100,26 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(Setting.CorruptedCitizensDisplay)),
                   "Anzahl der Bürger-Entitäten, die beim Klick auf **[Bürger bereinigen]** entfernt werden,\n\n" +
                   "abhängig von den gewählten Kästchen [ ✓ ]." },
+
+                // New status rows (English fallback until this locale is translated)
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.CitizenCountComparisonDisplay)), "Citizen Count Comparison" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.PersonalCarStatusDisplay)), "Personal Cars" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.PersonalCarParkingDisplay)), "Personal-Car Parking" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OutsideConnectionOwnerDisplay)), "OC-Hidden Car Owners" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OutsideConnectionStageDisplay)), "OC-Hidden Staging Evidence" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.BicycleStatusDisplay)), "Bicycles" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.BicycleParkingDisplay)), "Bicycle Parking" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.VehicleOwnershipDisplay)), "Potential Orphans" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.VehicleSnapshotTimeDisplay)), "Updated" },
+                { "CitizenCleaner/Status/CitizenCountRow", "CC household-member entities {0} | game valid moved-in citizens {1} | difference {2}" },
+                { "CitizenCleaner/Status/CarSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
+                { "CitizenCleaner/Status/CarParkingRow", "Street {0} | building/parking facility {1} (hidden {2}) | OC hidden {3} | other {4} (hidden {5})" },
+                { "CitizenCleaner/Status/OcHiddenOwnerRow", "City household {0} | owner at OC {1} | nonresident/moving {2} | missing/non-household {3} | broken backlink {4}" },
+                { "CitizenCleaner/Status/OcHiddenStageRow", "OC evidence: parked lane {0} | TripSource {1} | TripSource with no lane {2} | HomeTarget {3} | keeper at OC {4}" },
+                { "CitizenCleaner/Status/BicycleSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
+                { "CitizenCleaner/Status/BicycleParkingRow", "Visible parked {0} | OC hidden {1} | hidden elsewhere {2}" },
+                { "CitizenCleaner/Status/OwnershipRow", "Ownership mismatches: personal cars {0} | bicycles {1}" },
+                { "CitizenCleaner/Status/CapturedAtRow", "Snapshot time {0}" },
 
                 // Prompts (used by Setting.cs for placeholder text)
                 { "CitizenCleaner/Prompt/RefreshCounts", "Klicke auf [Aktualisieren]" },

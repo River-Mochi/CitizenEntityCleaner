@@ -28,6 +28,7 @@ namespace CitizenCleaner
                 // Groups
                 { m_Setting.GetOptionGroupLocaleID(Setting.kFiltersGroup), "Cleanup Targets" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.kButtonGroup), "Actions" },
+                { m_Setting.GetOptionGroupLocaleID(Setting.StatusGroup), "Citizen & Vehicle Status" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.InfoGroup), "Info" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.DebugGroup), "Debug" },
 
@@ -89,12 +90,70 @@ namespace CitizenCleaner
                   "Number of citizen entities to remove when you click **[Cleanup]**,\n\n" +
                   "based on the selected boxes [ ✓ ]." },
 
+                // Read-only status rows
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.CitizenCountComparisonDisplay)), "Citizen Count Comparison" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.CitizenCountComparisonDisplay)),
+                  "Compares Citizen Cleaner's broad HouseholdMember entity count with the game's 1.6.0 valid moved-in citizen count. " +
+                  "They are not expected to match because the game count excludes commuters, tourists, moving-away, invalid, and other non-resident entities." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.PersonalCarStatusDisplay)), "Personal Cars" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.PersonalCarStatusDisplay)),
+                  "All non-deleted PersonalCar entities except bicycles and trailers." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.PersonalCarParkingDisplay)), "Personal-Car Parking" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.PersonalCarParkingDisplay)),
+                  "Exclusive parked buckets. Street uses a visible ParkingLane; facility follows the parked lane's owner chain to a GarageLane, ParkingFacility, CarParkingFacility, or Building; OC hidden uses Unspawned plus an OC parked lane or TripSource." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OutsideConnectionOwnerDisplay)), "OC-Hidden Car Owners" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.OutsideConnectionOwnerDisplay)),
+                  "Breaks OC-hidden cars down by owner location/type and also shows broken ownership backlinks. " +
+                  "Owner at OC is diagnostic only; commuters and moving-away households can be legitimate transitions." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OutsideConnectionStageDisplay)), "OC-Hidden Staging Evidence" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.OutsideConnectionStageDisplay)),
+                  "Shows whether an OC-hidden car is linked by its parked lane or TripSource. " +
+                  "TripSource at OC with no parked lane matches the game's initial no-nearby-parking fallback and is not proof of abandonment." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.BicycleStatusDisplay)), "Bicycles" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.BicycleStatusDisplay)),
+                  "Bicycles are PersonalCar entities in the game, but are displayed separately because bicycle parking uses different infrastructure." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.BicycleParkingDisplay)), "Bicycle Parking" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.BicycleParkingDisplay)),
+                  "Separates visible parked bicycles from hidden bicycles at outside connections or elsewhere." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.VehicleOwnershipDisplay)), "Potential Orphans" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.VehicleOwnershipDisplay)),
+                  "Point-in-time ownership backlink mismatches using the same rules as the game's PersonalCarOwnerSystem. " +
+                  "The game normally removes these, so a small temporary count is possible." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.VehicleSnapshotTimeDisplay)), "Updated" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.VehicleSnapshotTimeDisplay)),
+                  "Vehicle data is scanned only when you press [Refresh Counts] or write the debug report; there is no per-frame status scan." },
+
                 // Prompts (used by Setting.cs for placeholder text)
                 { "CitizenCleaner/Prompt/RefreshCounts", "Click [Refresh Counts]" },
                 { "CitizenCleaner/Prompt/NoCity", "No city loaded" },
                 { "CitizenCleaner/Prompt/Error",  "Error" },
                 { "CitizenCleaner/Status/Progress", "Cleanup in progress… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "Cleaning… {0}" },
+                { "CitizenCleaner/Status/CitizenCountRow",
+                  "CC household-member entities {0} | game valid moved-in citizens {1} | difference {2}" },
+                { "CitizenCleaner/Status/CarSummaryRow",
+                  "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
+                { "CitizenCleaner/Status/CarParkingRow",
+                  "Street {0} | building/parking facility {1} (hidden {2}) | OC hidden {3} | other {4} (hidden {5})" },
+                { "CitizenCleaner/Status/OcHiddenOwnerRow",
+                  "City household {0} | owner at OC {1} | nonresident/moving {2} | missing/non-household {3} | broken backlink {4}" },
+                { "CitizenCleaner/Status/OcHiddenStageRow",
+                  "OC evidence: parked lane {0} | TripSource {1} | TripSource with no lane {2} | HomeTarget {3} | keeper at OC {4}" },
+                { "CitizenCleaner/Status/BicycleSummaryRow",
+                  "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
+                { "CitizenCleaner/Status/BicycleParkingRow",
+                  "Visible parked {0} | OC hidden {1} | hidden elsewhere {2}" },
+                { "CitizenCleaner/Status/OwnershipRow",
+                  "Ownership mismatches: personal cars {0} | bicycles {1}" },
+                { "CitizenCleaner/Status/CapturedAtRow", "Snapshot time {0}" },
 
 
                 // About tab fields
@@ -137,19 +196,19 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(Setting.UsageNotes)), "" },
 
 
-                 // Debug Tab preview - logs a sample list of corrupt citizens
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.LogCorruptPreviewButton)), "LOG - Corrupt IDs (first 10)" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.LogCorruptPreviewButton)),
-                  "- Adds a list of the first **25 Corrupt citizen IDs** to the log file **(Index:Version)** for Scene Explorer cross-check.\n\n" +
-                  "- **Preview only** — does not delete anything.\n\n" +
+                 // Debug Tab — one read-only diagnostic report
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.LogDiagnosticReportButton)), "Write Diagnostic Report to Log" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.LogDiagnosticReportButton)),
+                  "- Writes one organized report with **25 corrupt IDs**, plus **10 moving-away, 10 commuter, and 10 homeless IDs** (Index:Version).\n\n" +
+                  "- Also includes the game/CC citizen-count comparison and personal-car/bicycle status.\n\n" +
+                  "- **Read-only** — does not delete anything.\n\n" +
                   "- Log file at:\n" +
                   "%USERPROFILE%/AppData/LocalLow/Colossal Order/Cities Skylines II/logs/CitizenCleaner.log" },
 
                 // Sentence UNDER the button (multiline text row)
                 // LabelLocale = inline body under the button
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.DebugCorruptNote)),
-                  "Debug use: log sample list — nothing is deleted.\n" +
-                  "List the first 25 IDs of corrupt entities in the log." },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.DebugReportNote)),
+                  "One button writes the complete, readable troubleshooting report. Nothing is deleted." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OpenLogButton)), "Open Log" },
                 { m_Setting.GetOptionDescLocaleID(nameof(Setting.OpenLogButton)), "Open the log file in the default text editor." },

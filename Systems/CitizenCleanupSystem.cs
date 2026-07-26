@@ -1,6 +1,6 @@
 // CitizenCleanupSystem.cs
 using Colossal.Logging;
-using Game.Citizens;        // for Citizen, HouseholdMember, TravelPurpose
+using Game.Citizens;        // HouseholdMember
 using Game.Common;          // for Deleted
 using Unity.Collections;    // for NativeList
 using Unity.Entities;       // Entity, SystemBase, ComponentType, EntityQuery, etc.
