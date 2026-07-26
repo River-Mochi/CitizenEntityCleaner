@@ -1,14 +1,16 @@
-using System.Reflection;
-using Colossal.IO.AssetDatabase;
-using Colossal.Localization;
-using Colossal.Logging;
-using Colossal.PSI.Environment;
-using Game;
-using Game.Modding;
-using Game.SceneFlow;
-
 namespace CitizenCleaner
 {
+    using System.Reflection;
+
+    using Colossal.IO.AssetDatabase;
+    using Colossal.Localization;
+    using Colossal.Logging;
+    using Colossal.PSI.Environment;
+
+    using Game;
+    using Game.Modding;
+    using Game.SceneFlow;
+
     public class Mod : IMod
     {
         private const string kLogId = "CitizenCleaner";
@@ -84,22 +86,16 @@ namespace CitizenCleaner
                 log.Warn("Localization manager was not available.");
             }
 
-            AssetDatabase.global.LoadSettings(
-                ModKeys.SettingsKey,
-                setting,
-                new CCSetting(this));
+            AssetDatabase.global.LoadSettings( ModKeys.SettingsKey, setting, new CCSetting(this));
             setting.RegisterInOptionsUI();
 
-            updateSystem.UpdateAt<CitizenCleanupSystem>(
-                SystemUpdatePhase.Modification1);
+            updateSystem.UpdateAt<CitizenCleanupSystem>( SystemUpdatePhase.Modification1);
 
-            CleanupSystem =
-                updateSystem.World
+            CleanupSystem = updateSystem.World
                     .GetOrCreateSystemManaged<CitizenCleanupSystem>();
             CleanupSystem.SetSettings(setting);
 
-            VehicleStatusSystem =
-                updateSystem.World
+            VehicleStatusSystem = updateSystem.World
                     .GetOrCreateSystemManaged<CitizenVehicleStatusSystem>();
 
             CleanupSystem.OnCleanupProgress += setting.UpdateCleanupProgress;
@@ -107,6 +103,7 @@ namespace CitizenCleaner
             CleanupSystem.OnCleanupNoWork += setting.FinishCleanupNoWork;
         }
 
+        // Unsubscribe event handlers, unregisters Options UI
         public void OnDispose()
         {
             CCSetting? setting = Settings;

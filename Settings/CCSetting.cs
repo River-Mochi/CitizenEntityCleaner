@@ -1,16 +1,18 @@
 // CCSetting.cs
-using System;                   // Exception, Action
-using System.Collections;       // IEnumerator (for NextFrame)
-using Colossal.IO.AssetDatabase;    // [FileLocation]
-using Colossal.Localization;
-using Game.Modding;             // IMod
-using Game.SceneFlow;           // GameManager
-using Game.Settings;            // ModSetting, [SettingsUI*]
-using UnityEngine;              // Application.OpenURL
-
-
 namespace CitizenCleaner
 {
+    using System;                   // Exception, Action
+    using System.Collections;       // IEnumerator (for NextFrame)
+
+    using Colossal.IO.AssetDatabase;    // [FileLocation]
+    using Colossal.Localization;
+
+    using Game.Modding;             // IMod
+    using Game.SceneFlow;           // GameManager
+    using Game.Settings;            // ModSetting, [SettingsUI*]
+
+    using UnityEngine;              // Application.OpenURL
+
     internal static class ModKeys
     {
         public const string SettingsKey = "CitizenCleaner";

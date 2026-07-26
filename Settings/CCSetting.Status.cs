@@ -1,9 +1,10 @@
 // CCSetting.Status.cs
-using System;
-using Game.Settings;
-
 namespace CitizenCleaner
 {
+    using System;
+
+    using Game.Settings;
+
     /// <summary>
     /// Read-only citizen-count comparison and personal-vehicle status rows.
     /// Builds once on first display, then updates with Refresh Counts.

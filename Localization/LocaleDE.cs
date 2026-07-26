@@ -1,9 +1,10 @@
 // LocaleDE.cs
-using System.Collections.Generic;  // Dictionary
-using Colossal;                    // IDictionarySource
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;  // Dictionary
+
+    using Colossal;                    // IDictionarySource
+
     /// <summary>
     /// German locale entries (de-DE)
     /// </summary>

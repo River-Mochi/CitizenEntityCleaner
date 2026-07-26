@@ -4,7 +4,6 @@
 		<Configurations>Debug;Release</Configurations>
 		<!--The file where mod information which is required for publishing mod on PDX mods are stored -->
 		<PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
-		<TargetFramework>net48</TargetFramework>
 
 		<!--Single source for Version (note PublishConfiguration is separate) -->
 		<Version>1.6.2</Version>
@@ -15,12 +14,13 @@
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 
 		<GameVersion>1.6.*</GameVersion>
-		<!-- Company allows reflection of author property -->
-		<Company>$(Authors)</Company>
 		<!-- AssemblyTitle for About tab, AssemblyName for DLL & folder name, Product for Windows properties -->
-		<AssemblyTitle>Citizen Cleaner</AssemblyTitle>
 		<AssemblyName>CitizenCleaner</AssemblyName>
+		<RootNamespace>CitizenCleaner</RootNamespace>
+		<AssemblyTitle>Citizen Cleaner</AssemblyTitle>
 		<Product>Citizen Cleaner</Product>
+
+
 
 		<!-- Compile warnings to prevent NullReferenceExceptions -->
 		<Nullable>enable</Nullable>
