@@ -14,6 +14,7 @@
 		<!-- Keep CLR binding stable -->
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 
+		<GameVersion>1.6.*</GameVersion>
 		<!-- Company allows reflection of author property -->
 		<Company>$(Authors)</Company>
 		<!-- AssemblyTitle for About tab, AssemblyName for DLL & folder name, Product for Windows properties -->
@@ -148,6 +149,11 @@
 	<ItemGroup>
 		<None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
 		<None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Scripts\" />
+	  <Folder Include="Systems\" />
 	</ItemGroup>
 
 </Project>
