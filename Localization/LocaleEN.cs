@@ -178,15 +178,16 @@ namespace CitizenCleaner
 #endif
 
                 // About tab links (the three external link buttons)
+                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenParadoxModsButton)), "Paradox Mods" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenParadoxModsButton)),  "Paradox Mods website; opens in browser." },
+
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenGithubButton)),  "GitHub" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenGithubButton)),   "GitHub repository for the mod; opens in browser." },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenGithubButton)),   "GitHub link for feedback on the mod." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenDiscordButton)), "Discord" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenDiscordButton)),  "Discord chat for feedback on the mod; opens in browser." },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenParadoxModsButton)), "Paradox Mods" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenParadoxModsButton)),  "Paradox Mods website; opens in browser." },
-
+               
                 // About tab --> Usage section header & blocks
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.UsageGroup), "USAGE" },
 
@@ -206,19 +207,22 @@ namespace CitizenCleaner
 
 
                  // Debug Tab — one read-only diagnostic report
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "Write Report to Log" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "Log Entity IDs" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
-                  "- Writes report with" +
-                  "**25 corrupt IDs**, **10 moving-away, 10 commuter, and 10 homeless IDs** (Index:Version).\n\n" +
-                  "- Also includes the game/CC citizen-count comparison and personal-car/bicycle status.\n\n" +
-                  "- **Read-only** — does not delete anything.\n\n" +
+                  "- Writesreport to the log file with **Entity IDs** for" +
+                  "**Corrupt citizens, moving-away, commuter, and homeless** (Index:Version).\n\n" +
+                  "- For Scene Explorer mod cross-check\n" +
+                  "- Includes the game/CC citizen-count comparison and personal-car/bicycle status.\n\n" +
+                  "- **Preview only** — does not delete anything.\n\n" +
                   "- Log file at:\n" +
                   "%USERPROFILE%/AppData/LocalLow/Colossal Order/Cities Skylines II/logs/CitizenCleaner.log" },
 
                 // Sentence UNDER the button (multiline text row)
                 // LabelLocale = inline body under the button
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
-                  "One button writes the complete, troubleshooting report. Nothing is deleted." },
+                  "Debug use: log sample list — nothing is deleted.\n" +
+                  "List the first 10-25 IDs of corrupt and other entities in the log." 
+                },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogButton)), "Open Log" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogButton)),
