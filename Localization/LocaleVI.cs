@@ -1,11 +1,12 @@
 // LocaleVI.cs
-using System.Collections.Generic;  // Dictionary
-using Colossal;                    // IDictionarySource
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;  // Dictionary
+
+    using Colossal;                    // IDictionarySource
+
     /// <summary>
-    /// Vietnamese locale entries (vi-VN)
+    /// Vietnamese locale (vi-VN)
     /// </summary>
     public class LocaleVI : IDictionarySource
     {

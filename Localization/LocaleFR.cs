@@ -1,11 +1,12 @@
 // LocaleFR.cs
-using System.Collections.Generic;  // Dictionary
-using Colossal;                    // IDictionarySource
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;  // Dictionary
+
+    using Colossal;                    // IDictionarySource
+
     /// <summary>
-    /// French locale entries (fr-FR)
+    /// French locale (fr-FR)
     /// </summary>
     public class LocaleFR : IDictionarySource
     {

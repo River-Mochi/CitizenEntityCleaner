@@ -1,10 +1,11 @@
-using System.Collections.Generic;
-using Colossal;
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;
+
+    using Colossal;
+
     /// <summary>
-    /// Traditional Chinese locale entries (zh-HANT).
+    /// Traditional Chinese locale (zh-HANT).
     /// </summary>
     public class LocaleZH_HANT : IDictionarySource
     {

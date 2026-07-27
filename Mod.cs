@@ -56,9 +56,6 @@ namespace CitizenCleaner
 
             if (localizationManager != null)
             {
-                LocaleZH_CN zhHans = new LocaleZH_CN(setting);
-                LocalePT_BR ptBr = new LocalePT_BR(setting);
-
                 localizationManager.AddSource("en-US", new LocaleEN(setting));
                 localizationManager.AddSource("fr-FR", new LocaleFR(setting));
                 localizationManager.AddSource("es-ES", new LocaleES(setting));
@@ -68,11 +65,8 @@ namespace CitizenCleaner
                 localizationManager.AddSource("ko-KR", new LocaleKO(setting));
                 localizationManager.AddSource("vi-VN", new LocaleVI(setting));
                 localizationManager.AddSource("pl-PL", new LocalePL(setting));
-                localizationManager.AddSource("pt-BR", ptBr);
-                localizationManager.AddSource("pt", ptBr);
-                localizationManager.AddSource("zh-HANS", zhHans);
-                localizationManager.AddSource("zh-CN", zhHans);
-                localizationManager.AddSource("zh", zhHans);
+                localizationManager.AddSource("pt-BR", new LocalePT_BR(setting));
+                localizationManager.AddSource("zh-HANS", new LocaleZH_HANS(setting));
                 localizationManager.AddSource("zh-HANT", new LocaleZH_HANT(setting));
 
 #if DEBUG
@@ -83,7 +77,7 @@ namespace CitizenCleaner
             }
             else
             {
-                log.Warn("Localization manager was not available.");
+                log.Warn("Localization manager not available.");
             }
 
             AssetDatabase.global.LoadSettings( ModKeys.SettingsKey, setting, new CCSetting(this));

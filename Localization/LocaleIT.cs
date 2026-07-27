@@ -1,11 +1,12 @@
 // LocaleIT.cs
-using System.Collections.Generic;  // Dictionary
-using Colossal;                    // IDictionarySource
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;  // Dictionary
+
+    using Colossal;                    // IDictionarySource
+
     /// <summary>
-    /// Italian locale entries (it-IT)
+    /// Italian locale (it-IT)
     /// </summary>
     public class LocaleIT : IDictionarySource
     {

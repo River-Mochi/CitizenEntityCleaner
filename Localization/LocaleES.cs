@@ -1,11 +1,12 @@
 // LocaleES.cs
-using System.Collections.Generic;  // Dictionary
-using Colossal;                    // IDictionarySource
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;  // Dictionary
+
+    using Colossal;                    // IDictionarySource
+
     /// <summary>
-    /// Spanish locale entries (es-ES)
+    /// Spanish locale (es-ES)
     /// </summary>
     public class LocaleES : IDictionarySource
     {

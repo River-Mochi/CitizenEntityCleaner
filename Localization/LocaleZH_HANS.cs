@@ -1,16 +1,17 @@
-// LocaleZH_CN.cs
-using System.Collections.Generic;  // Dictionary
-using Colossal;                    // IDictionarySource
-
+// LocaleZH_HANS.cs
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;  // Dictionary
+
+    using Colossal;                    // IDictionarySource
+
     /// <summary>
-    /// Simplified Chinese (zh-CN) locale entries
+    /// Simplified Chinese (zh-CN) locale
     /// </summary>
-    public class LocaleZH_CN : IDictionarySource
+    public class LocaleZH_HANS : IDictionarySource
     {
         private readonly CCSetting m_Setting;
-        public LocaleZH_CN(CCSetting setting) { m_Setting = setting; }
+        public LocaleZH_HANS(CCSetting setting) { m_Setting = setting; }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
             IList<IDictionaryEntryError> errors, Dictionary<string, int> indexCounts)

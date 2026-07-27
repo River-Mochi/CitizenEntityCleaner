@@ -8,19 +8,18 @@
 		<!--Single source for Version (note PublishConfiguration is separate) -->
 		<Version>1.6.2</Version>
 
+		<GameVersion>1.6.*</GameVersion>
+
 		<!-- For Windows file properties -->
 		<FileVersion>$(Version).0</FileVersion>
 		<!-- Keep CLR binding stable -->
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 
-		<GameVersion>1.6.*</GameVersion>
 		<!-- AssemblyTitle for About tab, AssemblyName for DLL & folder name, Product for Windows properties -->
 		<AssemblyName>CitizenCleaner</AssemblyName>
 		<RootNamespace>CitizenCleaner</RootNamespace>
 		<AssemblyTitle>Citizen Cleaner</AssemblyTitle>
 		<Product>Citizen Cleaner</Product>
-
-
 
 		<!-- Compile warnings to prevent NullReferenceExceptions -->
 		<Nullable>enable</Nullable>
@@ -45,10 +44,6 @@
 	<Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets" />
 
 	<ItemGroup>
-		<Reference Include="cohtml.Net">
-			<HintPath>$(ManagedPath)\cohtml.Net.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
 		<Reference Include="Colossal.AssetPipeline">
 			<HintPath>$(ManagedPath)\Colossal.AssetPipeline.dll</HintPath>
 			<Private>False</Private>
@@ -63,10 +58,6 @@
 		</Reference>
 		<Reference Include="Colossal.Mathematics">
 			<HintPath>$(ManagedPath)\Colossal.Mathematics.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="Colossal.Mono.Cecil">
-			<HintPath>$(ManagedPath)\Colossal.Mono.Cecil.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Colossal.PSI.Common">
@@ -91,14 +82,6 @@
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Colossal.IO.AssetDatabase">
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="Newtonsoft.Json">
-			<HintPath>$(ManagedPath)\Newtonsoft.Json.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="System.Windows.Forms">
-			<HintPath>$(ManagedPath)\System.Windows.Forms.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Unity.Burst.Unsafe">
@@ -128,10 +111,7 @@
 		<Reference Include="Unity.Mathematics">
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="UnityEngine.IMGUIModule">
-			<HintPath>$(ManagedPath)\UnityEngine.IMGUIModule.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
+
 	</ItemGroup>
 
 	<ItemGroup>

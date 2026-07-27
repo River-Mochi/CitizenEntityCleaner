@@ -1,11 +1,12 @@
 // LocaleJA.cs
-using System.Collections.Generic;  // Dictionary
-using Colossal;                    // IDictionarySource
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;  // Dictionary
+
+    using Colossal;                    // IDictionarySource
+
     /// <summary>
-    /// Japanese locale entries (ja-JP)
+    /// Japanese locale (ja-JP)
     /// </summary>
     public class LocaleJA : IDictionarySource
     {

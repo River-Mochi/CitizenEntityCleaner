@@ -6,7 +6,7 @@ namespace CitizenCleaner
     using Colossal;                    // IDictionarySource
 
     /// <summary>
-    /// German locale entries (de-DE)
+    /// German locale (de-DE)
     /// </summary>
     public class LocaleDE : IDictionarySource
     {

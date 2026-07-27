@@ -1,11 +1,12 @@
 // LocalePT.cs
-using System.Collections.Generic;  // Dictionary
-using Colossal;                    // IDictionarySource
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;  // Dictionary
+
+    using Colossal;                    // IDictionarySource
+
     /// <summary>
-    /// Portuguese (Brazil) locale entries (pt-BR)
+    /// Portuguese (Brazil) (pt-BR)
     /// </summary>
     public class LocalePT_BR : IDictionarySource
     {

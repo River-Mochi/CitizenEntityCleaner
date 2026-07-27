@@ -1,10 +1,11 @@
-using System.Collections.Generic;
-using Colossal;
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;
+
+    using Colossal;
+
     /// <summary>
-    /// Polish locale entries (pl-PL).
+    /// Polish locale (pl-PL).
     /// </summary>
     public class LocalePL : IDictionarySource
     {

@@ -1,11 +1,12 @@
 // LocaleKO.cs
-using System.Collections.Generic;  // Dictionary
-using Colossal;                    // IDictionarySource
-
 namespace CitizenCleaner
 {
+    using System.Collections.Generic;  // Dictionary
+
+    using Colossal;                    // IDictionarySource
+
     /// <summary>
-    /// Korean locale entries (ko-KR)
+    /// Korean locale (ko-KR)
     /// </summary>
     public class LocaleKO : IDictionarySource
     {
