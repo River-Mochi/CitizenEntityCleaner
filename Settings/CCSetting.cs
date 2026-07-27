@@ -54,7 +54,7 @@ namespace CitizenCleaner
         private const string StatusProgressKey = "CitizenCleaner/Status/Progress"; // "{0}" = P0 percent
         private const string StatusCleaningKey = "CitizenCleaner/Status/Cleaning"; // "{0}" = P0 percent
 
-        private static string L(string key, string fallback)
+        internal static string L(string key, string fallback)
         {
             LocalizationDictionary? dict = GameManager.instance?.localizationManager?.activeDictionary;
             return (dict != null && dict.TryGetValue(key, out var s) && !string.IsNullOrWhiteSpace(s))
@@ -306,7 +306,6 @@ namespace CitizenCleaner
         {
             set
             {
-                // Guard before work
                 CitizenCleanupSystem? cleanupSystem = Mod.CleanupSystem;
                 if (cleanupSystem == null)
                 {
@@ -316,15 +315,11 @@ namespace CitizenCleaner
 
                 if (!cleanupSystem.HasAnyCitizenData())
                 {
-                    Mod.log.Info("[Preview] No city loaded (no citizen data). Load a city first.");
+                    Mod.log.Info("[Report] No city loaded. Load a city first.");
                     return;
                 }
 
-                // One read-only report:
-                //  - 25 corrupt citizen IDs
-                //  - 10 moving-away, commuter, and homeless citizen IDs each
-                //  - official 1.6.0 citizen counters
-                //  - personal-car and bicycle status
+                // Includes citizen IDs, game counters, and vehicle status.
                 cleanupSystem.LogDiagnosticReportToLog();
             }
         }
@@ -631,4 +626,3 @@ namespace CitizenCleaner
 
     }
 }
-
