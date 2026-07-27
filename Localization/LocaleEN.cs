@@ -2,7 +2,6 @@
 namespace CitizenCleaner
 {
     using System.Collections.Generic;  // Dictionary
-
     using Colossal;                    // IDictionarySource
 
     /// <summary>
@@ -40,7 +39,7 @@ namespace CitizenCleaner
                   "These citizens belong to households without PropertyRenter and are not homeless, commuters, tourists, or moving-away.\n\n" +
                   "- Corrupt citizens and abandoned cars are the main target of this mod.\n" +
                   "- The game's normal cleanup systems handle remaining references after CC marks a citizen for deletion.\n" +
-                  "- If no household members remain, its personal vehicle should also be removed, freeing parking spaces." },
+                  "- If no household members remain, then personal vehicle should also be removed, freeing parking spaces." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ Moving-Away (Rent = 0)" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)),
@@ -207,9 +206,10 @@ namespace CitizenCleaner
 
 
                  // Debug Tab — one read-only diagnostic report
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "Write Diagnostic Report to Log" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "Write Report to Log" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
-                  "- Writes one organized report with **25 corrupt IDs**, plus **10 moving-away, 10 commuter, and 10 homeless IDs** (Index:Version).\n\n" +
+                  "- Writes report with" +
+                  "**25 corrupt IDs**, **10 moving-away, 10 commuter, and 10 homeless IDs** (Index:Version).\n\n" +
                   "- Also includes the game/CC citizen-count comparison and personal-car/bicycle status.\n\n" +
                   "- **Read-only** — does not delete anything.\n\n" +
                   "- Log file at:\n" +
@@ -218,10 +218,12 @@ namespace CitizenCleaner
                 // Sentence UNDER the button (multiline text row)
                 // LabelLocale = inline body under the button
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
-                  "One button writes the complete, readable troubleshooting report. Nothing is deleted." },
+                  "One button writes the complete, troubleshooting report. Nothing is deleted." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogButton)), "Open Log" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogButton)), "Open the log file in the default text editor." },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogButton)),
+                    "Open the **Logs/CitizenCleaner.log** file in the default text editor."
+                },
 
             };
         }

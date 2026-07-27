@@ -2,7 +2,6 @@
 namespace CitizenCleaner
 {
     using System.Collections.Generic;  // Dictionary
-
     using Colossal;                    // IDictionarySource
 
     /// <summary>
