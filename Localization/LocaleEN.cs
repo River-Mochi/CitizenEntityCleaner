@@ -35,10 +35,10 @@ namespace CitizenCleaner
                 // Filter toggles
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeCorrupt)), "▪ Corrupt Citizens" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeCorrupt)),
-                  "When enabled (default), counts **corrupt** citizens for [Cleanup Citizens].\n" +
+                  "When enabled (default), counts **Corrupt** citizens for [Cleanup Citizens].\n" +
                   "These citizens belong to households without PropertyRenter and are not homeless, commuters, tourists, or moving-away.\n\n" +
-                  "- **Abandoned Cars:** corrupt citizens and their abandoned cars are the main target of this mod.\n" +
-                  "- When no household members remain, the game should remove the household's personal vehicle, freeing parking spaces.\n" +
+                  "- Abandoned Cars: corrupt citizens and their abandoned cars are the main target of this mod.\n" +
+                  "- When household members are cleaned up, the game should naturally remove the household's personal vehicle, thus freeing parking spaces.\n" +
                   "- CC marks citizens for deletion; the game's cleanup systems handle remaining references." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ Moving-Away (Rent = 0)" },
