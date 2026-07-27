@@ -4,7 +4,6 @@ namespace CitizenCleaner
     using System.Collections.Generic;  // Dictionary
 
     using Colossal;                    // IDictionarySource
-    using Colossal.IO.AssetDatabase.Internal;
 
     /// <summary>
     /// English locale (en-US)
@@ -37,12 +36,11 @@ namespace CitizenCleaner
                 // Filter toggles
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeCorrupt)), "▪ Corrupt Citizens" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeCorrupt)),
-                  "When enabled, counts **corrupt** citizens and preps for the <[Cleanup Citizen]> button.\n" +
-                  "These are residents that lack a PropertyRenter component (and are not homeless, commuters, tourists, or moving-away).\n\n" +
-                  "- Corrupt citizens and their abandoned cars are the main target of this mod. If the city contains too many, it could cause problems over time.\n" +
-                  "- The game naturally/safely removes references to the cleaned citizen like cars, school/patient references, etc..\n" +
-                  "- Abandoned cars: if the household has no remaining members, the personal vehicle is also removed, freeing up parking spaces."
-                },
+                  "When enabled (default), counts **corrupt** citizens for [Cleanup Citizens].\n" +
+                  "These citizens belong to households without PropertyRenter and are not homeless, commuters, tourists, or moving-away.\n\n" +
+                  "- Corrupt citizens and abandoned cars are the main target of this mod.\n" +
+                  "- The game's normal cleanup systems handle remaining references after CC marks a citizen for deletion.\n" +
+                  "- If no household members remain, its personal vehicle should also be removed, freeing parking spaces." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ Moving-Away (Rent = 0)" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)),
@@ -68,7 +66,7 @@ namespace CitizenCleaner
 
                 // Warning (confirmation)
                 { m_Setting.GetOptionWarningLocaleID(nameof(CCSetting.CleanupEntitiesButton)),
-                  "Permanently delete items selected in options.\n\nPlease backup your save first!\n Continue?" },
+                  "Permanently delete items selected in options.\n\nPlease back up your save first!\nContinue?" },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.RefreshCountsButton)), "Refresh Counts" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.RefreshCountsButton)),
@@ -92,14 +90,12 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "Citizens to Clean: select [ ✓ ] above" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
-                  "Number of citizen entities to remove when you click **[Cleanup]**,\n\n" +
-                  "based on the selected boxes [ ✓ ]." },
+                  "Citizen entities that [Cleanup Citizens] will remove, based on the selected boxes [ ✓ ]." },
 
                 // Read-only status rows
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CitizenCountComparisonDisplay)), "Citizen Count Comparison" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CitizenCountComparisonDisplay)),
-                  "Compares Citizen Cleaner's broad HouseholdMember entity count with the game's 1.6.0 valid moved-in citizen count. " +
-                  "They are not expected to match because the game count excludes commuters, tourists, moving-away, invalid, and other non-resident entities." },
+                  "CC counts all non-deleted HouseholdMember entities. The game counts only valid moved-in citizens, so the totals are not expected to match." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)), "Personal Cars" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)),
@@ -197,7 +193,7 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.UsageSteps)),
                   "1. <Backup your save file first!>\n" +
-                  "2. <Click [Refresh Counts] to see current statistics.>\n" +
+                  "2. <Review the statistics; press [Refresh Counts] to update them.>\n" +
                   "3. [ ✓ ] <Select the items to include using the checkboxes>\n" +
                   "4. <Click [Cleanup Citizens] to clean up entities.>" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.UsageSteps)), "" },
