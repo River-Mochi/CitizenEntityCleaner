@@ -131,9 +131,5 @@
 		<None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Scripts\" />
-	  <Folder Include="Systems\" />
-	</ItemGroup>
 
 </Project>

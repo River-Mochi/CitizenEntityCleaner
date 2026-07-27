@@ -1,4 +1,4 @@
-// LocaleEN.cs
+// Localization/LocaleEN.cs
 namespace CitizenCleaner
 {
     using System.Collections.Generic;  // Dictionary

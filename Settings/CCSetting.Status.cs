@@ -1,4 +1,4 @@
-// CCSetting.Status.cs
+// Settings/CCSetting.Status.cs
 namespace CitizenCleaner
 {
     using System;

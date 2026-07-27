@@ -1,4 +1,4 @@
-// CCSetting.cs
+// Settings/CCSetting.cs
 namespace CitizenCleaner
 {
     using System;                   // Exception, Action
