@@ -4,6 +4,7 @@ namespace CitizenCleaner
     using System.Collections.Generic;  // Dictionary
 
     using Colossal;                    // IDictionarySource
+    using Colossal.IO.AssetDatabase.Internal;
 
     /// <summary>
     /// English locale (en-US)
@@ -36,9 +37,12 @@ namespace CitizenCleaner
                 // Filter toggles
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeCorrupt)), "▪ Corrupt Citizens" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeCorrupt)),
-                  "When enabled (default), counts and cleans up **corrupt** citizens;\n" +
-                  "residents that lack a PropertyRenter component (and are not homeless, commuters, tourists, or moving-away).\n\n" +
-                  "Corrupt citizens are the main target of this mod. If the city contains too many, it could cause problems over time." },
+                  "When enabled, counts **corrupt** citizens and preps for the <[Cleanup Citizen]> button.\n" +
+                  "These are residents that lack a PropertyRenter component (and are not homeless, commuters, tourists, or moving-away).\n\n" +
+                  "- Corrupt citizens and their abandoned cars are the main target of this mod. If the city contains too many, it could cause problems over time.\n" +
+                  "- The game naturally/safely removes references to the cleaned citizen like cars, school/patient references, etc..\n" +
+                  "- Abandoned cars: if the household has no remaining members, the personal vehicle is also removed, freeing up parking spaces."
+                },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ Moving-Away (Rent = 0)" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)),
