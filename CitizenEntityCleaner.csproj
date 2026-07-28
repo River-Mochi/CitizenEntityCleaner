@@ -6,7 +6,7 @@
 		<PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
 
 		<!--Single source for Version (note PublishConfiguration is separate) -->
-		<Version>1.6.2</Version>
+		<Version>1.6.5</Version>
 
 		<GameVersion>1.6.*</GameVersion>
 
