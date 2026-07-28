@@ -56,7 +56,7 @@ namespace CitizenCleaner
                     for (int j = 0; j < members.Length; j++)
                     {
                         Entity citizen = members[j].m_Citizen;
-                        if (!IsEligibleCitizen(citizen))
+                        if (!IsEligibleCitizen(citizen, type))
                             continue;
 
                         candidates.Add(citizen);
@@ -117,12 +117,65 @@ namespace CitizenCleaner
             return CleanupType.None;
         }
 
+        private enum HomelessExclusionReason
+        {
+            None,
+            MissingCitizen,
+            Tourist,
+            Commuter,
+            InvalidCitizen,
+            Dead,
+            MissingHomelessFlag,
+        }
+
         private bool IsEligibleCitizen(Entity citizen)
         {
             return
                 EntityManager.Exists(citizen) &&
                 !EntityManager.HasComponent<Deleted>(citizen) &&
                 !EntityManager.HasComponent<Temp>(citizen);
+        }
+
+        private bool IsEligibleCitizen(Entity citizen, CleanupType type)
+        {
+            if (!IsEligibleCitizen(citizen))
+                return false;
+
+            return
+                type != CleanupType.Homeless ||
+                GetHomelessExclusionReason(citizen) ==
+                    HomelessExclusionReason.None;
+        }
+
+        private HomelessExclusionReason GetHomelessExclusionReason(
+            Entity citizen)
+        {
+            if (!EntityManager.HasComponent<Citizen>(citizen))
+                return HomelessExclusionReason.MissingCitizen;
+
+            Citizen citizenData =
+                EntityManager.GetComponentData<Citizen>(citizen);
+
+            if ((citizenData.m_State & CitizenFlags.Tourist) != 0)
+                return HomelessExclusionReason.Tourist;
+
+            if ((citizenData.m_State & CitizenFlags.Commuter) != 0)
+                return HomelessExclusionReason.Commuter;
+
+            if ((citizenData.m_State & CitizenFlags.ValidCitizen) == 0)
+                return HomelessExclusionReason.InvalidCitizen;
+
+            if (EntityManager.HasComponent<HealthProblem>(citizen) &&
+                CitizenUtils.IsDead(
+                    EntityManager.GetComponentData<HealthProblem>(citizen)))
+            {
+                return HomelessExclusionReason.Dead;
+            }
+
+            if ((citizenData.m_State & CitizenFlags.Homeless) == 0)
+                return HomelessExclusionReason.MissingHomelessFlag;
+
+            return HomelessExclusionReason.None;
         }
 
         private static string FormatIndexVersion(Entity entity) =>

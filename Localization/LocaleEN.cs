@@ -37,10 +37,10 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeCorrupt)), "▪ Corrupt Citizens" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeCorrupt)),
                   "When enabled (default), counts **Corrupt** citizens.\n" +
-                  "These are citizen without PropertyRenter and are not homeless, commuters, tourists, or moving-away.\n\n" +
-                  "- Corrupt citizens and abandoned cars are the main target of this mod.\n" +
-                  "- When citizens are cleaned up, the game should remove related personal vehicles and free parking spaces.\n" +
-                  "- CC marks citizens for deletion; the game's cleanup systems handle vehicle, school, patient, other references.)." },
+                  "These citizens belong to households without PropertyRenter and are not homeless, commuters, tourists, or moving-away.\n\n" +
+                  "- **Abandoned Cars:** corrupt citizens and abandoned cars are the main target.\n" +
+                  "- When no household members remain, the game should remove its personal vehicle and free the parking space.\n" +
+                  "- CC marks citizens for deletion; the game's cleanup systems handle vehicle, school, patient, and other references." },
 
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ Moving-Away (Rent = 0)" },
@@ -55,7 +55,8 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Homeless" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "When enabled, counts and cleans up **homeless** citizens.\n\n" +
+                  "Counts and cleans alive citizens marked **ValidCitizen + Homeless**.\n" +
+                  "Dead, tourist, commuter, and invalid citizens are excluded.\n\n" +
                   "<BE CAREFUL>: deleting homeless can cause unknown side effects." },
 
                 // Buttons
@@ -94,8 +95,8 @@ namespace CitizenCleaner
                   "Citizen entities that [Cleanup Citizens] will remove, based on the selected boxes [ ✓ ]." },
 
                 // Status Cars
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)), "Cars" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)),
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "Cars" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusCars)),
                     "Personal cars only; bicycle-group vehicles and trailers are reported separately.\n" +
                     "<Active> = on a lane and not parked; it may be moving or stopped.\n" +
                     "<Parked> = all parked personal cars.\n" +
@@ -104,34 +105,31 @@ namespace CitizenCleaner
                     "The city simulation is paused in Options. Run the city before refreshing to see simulation changes."
                 },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarParkingDisplay)), "Parked Cars" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.PersonalCarParkingDisplay)),
-                    "<Street> = cars assigned to a street ParkingLane.\n" +
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusParkedCars)), "Parked Cars" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusParkedCars)),
+                    "<Street> = visible parked cars on a street ParkingLane.\n" +
                     "<Facility> = cars in a building, garage, or parking facility.\n" +
                     "<OC> = hidden cars at an Outside Connection.\n" +
-                    "<Other> = parked cars not matched to those locations; not automatically abandoned.\n\n" +
+                    "<Other> = parked cars not matched above; Log Report shows details and IDs.\n\n" +
                     "Use **[LOG REPORT]**, then **[OPEN LOG]**, for full details."
                 },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OutsideConnectionOwnerDisplay)), "Hidden at OC" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OutsideConnectionOwnerDisplay)),           
-                    "Hidden cars located at an Outside Connection, grouped by owner.\n" +
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHiddenAtOc)), "Cars at OC" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHiddenAtOc)),
+                    "Hidden cars at an Outside Connection, grouped by owner.\n" +
                     "<City> = owner is a city household.\n" +
-                    "<OC> = owner is an Outside Connection entity, or its household is currently at an OC.\n" +
+                    "<At OC> = owner household is currently at an OC.\n" +
+                    "<OC owner> = Owner points directly to an OC; usually game-created DummyTraffic.\n" +
                     "<Away> = commuter, tourist, or moving-away household.\n" +
-                    "<Missing> = no owner or owner is not a household.\n\n" +
-                    "These categories do not automatically prove abandonment."
+                    "<Missing> = no owner or owner is not a household."
                 },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleOwnershipDisplay)), "Possible Orphans" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.VehicleOwnershipDisplay)),
-                  "Cars with an ownership mismatch. A temporary count is possible while the game updates." },
-
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogStatusReportButton)), "Log Report" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogStatusReportButton)), "LOG REPORT" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogStatusReportButton)),
-                  "Write full citizen and vehicle details to **Logs/CitizenCleaner.log**." },
+                  "Writes citizen and vehicle counts plus sample **Entity IDs** to CitizenCleaner.log.\n" +
+                  "Copy an ID into the **Scene Explorer** mod to inspect it." },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogFromStatusButton)), "Open Log" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogFromStatusButton)), "OPEN LOG" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogFromStatusButton)),
                   "Open **CitizenCleaner.log**." },
 
@@ -141,28 +139,23 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "Error" },
                 { "CitizenCleaner/Status/Progress", "Cleanup in progress… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "Cleaning… {0}" },
-                { "CitizenCleaner/Status/CarSummaryRow",
-                  "{0} active | {1} parked | {2} total" },
-                { "CitizenCleaner/Status/CarParkingRow",
-                  "{0} street | {1} facility | {2} OC hidden | {3} other" },
-                { "CitizenCleaner/Status/OcHiddenOwnerRow",
-                  "{0} city | {1} OC | {2} away | {3} missing | updated {4}" },
-                { "CitizenCleaner/Status/OwnershipRow",
-                  "{0} total | {1} street | {2} facility | {3} at OC" },
+                { "CitizenCleaner/Status/CarSummaryRowV2",
+                  "{0} active | {1} parked | {2} total | updated {3}" },
+                { "CitizenCleaner/Status/CarParkingRowV2",
+                  "{0} street | {1} facility | {2} OC | {3} other" },
+                { "CitizenCleaner/Status/OcHiddenOwnerRowV2",
+                  "{0} city | {1} at OC | {2} OC owner | {3} away | {4} missing" },
 
                 // Diagnostic report
                 { "CitizenCleaner/Report/Header",
-                  "CITIZEN CLEANER — DIAGNOSTIC REPORT\nGenerated: {0}" },
-                { "CitizenCleaner/Report/CitizenCounts",
-                  "[CITIZEN COUNTS]\n" +
-                  "CC household-member entities : {0}\n" +
-                  "Game valid moved-in citizens  : {1}\n" +
-                  "Difference (CC - game)         : {2}\n" +
-                  "Game homeless citizens        : {3}\n" +
-                  "Game moving-away households   : {4}\n" +
-                  "Game commuter households      : {5}\n" +
-                  "Game tourist citizens         : {6}\n" +
-                  "CC includes every non-deleted HouseholdMember; the game total includes valid moved-in citizens only." },
+                  "CITIZEN CLEANER — LOG REPORT\nGenerated: {0}" },
+                { "CitizenCleaner/Report/CitizenCrossCheckHeading",
+                  "[CITIZEN COUNT CROSS-CHECK — GAME 1.6]" },
+                { "CitizenCleaner/Report/CitizenCrossCheckNote",
+                  "Game 1.6 counters use game population rules. CC counts cleanup candidates; " +
+                  "moving-away and commuter game values count households, not citizens." },
+                { "CitizenCleaner/Report/HomelessCheckHeading",
+                  "[HOMELESS ELIGIBILITY CHECK]" },
                 { "CitizenCleaner/Report/GameCountsPending",
                   "Game counts are still initializing." },
                 { "CitizenCleaner/Report/CitizenIdsHeading",
@@ -174,38 +167,11 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Report/CommuterCitizens",
                   "Commuter citizens" },
                 { "CitizenCleaner/Report/HomelessCitizens",
-                  "Homeless citizens" },
-                { "CitizenCleaner/Report/EntitySampleSummary",
-                  "{0}: {1} total | {2} IDs" },
+                  "Eligible homeless citizens" },
                 { "CitizenCleaner/Report/IdsLabel", "IDs: " },
                 { "CitizenCleaner/Report/None", "(none)" },
                 { "CitizenCleaner/Report/VehicleSnapshotUnavailable",
                   "[PERSONAL VEHICLES]\nVehicle snapshot unavailable.\n" },
-                { "CitizenCleaner/Report/PersonalCars",
-                  "[PERSONAL CARS — bicycles excluded]\n" +
-                  "{0} active | {1} parked | {2} total | {3} other\n" +
-                  "Parked: {4} street | {5} facility ({6} hidden) | {7} OC hidden | {8} other ({9} hidden)" },
-                { "CitizenCleaner/Report/PossibleOrphans",
-                  "[POSSIBLE ORPHANS]\n" +
-                  "{0} total | {1} missing Owner | {2} missing OwnedVehicle buffer | {3} missing backlink\n" +
-                  "Parked: {4} street | {5} facility | {6} OC hidden | {7} other" },
-                { "CitizenCleaner/Report/OcHiddenCars",
-                  "[OC-HIDDEN CARS]\n" +
-                  "Owners: {0} city household | {1} household at OC | {2} direct OC entity | " +
-                  "{3} nonresident/moving | {4} missing/non-household\n" +
-                  "Evidence: {5} parked lane at OC | {6} TripSource at OC | {7} TripSource at OC without lane\n" +
-                  "Trip state: {8} HomeTarget | {9} keeper at OC" },
-                { "CitizenCleaner/Report/Bicycles",
-                  "[BICYCLES]\n" +
-                  "{0} active | {1} parked | {2} total | {3} other\n" +
-                  "Parked: {4} visible | {5} OC hidden | {6} hidden elsewhere\n" +
-                  "Keeper mismatches: {7}" },
-                { "CitizenCleaner/Report/Definitions",
-                  "[DEFINITIONS]\n" +
-                  "Street: visible ParkedCar on ParkingLane, excluding facilities.\n" +
-                  "Facility: parked lane owned by a garage, parking facility, or building.\n" +
-                  "OC hidden: ParkedCar + Unspawned linked to an outside connection.\n" +
-                  "Ownership mismatches can be temporary; location alone does not prove abandonment." },
 
 
                 // About tab fields
@@ -251,10 +217,9 @@ namespace CitizenCleaner
                  // Debug report
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "Log Entity IDs" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
-                  "Writes Entity IDs (Index:Version) for samples of **25 corrupt**, **10 moving-away, 10 commuter, and 10 homeless citizens**.\n" +
-                  "Use the **Scene Explorer** mod to inspect an Entity ID.\n" +
-                  "Also includes full citizen and personal-vehicle statistics.\n" +
-                  "Notepad++ or similar app is good to view log files."
+                  "Logs samples of **25 corrupt**, **10 moving-away, 10 commuter, and 10 homeless citizens**.\n" +
+                  "Also logs suspect vehicle Entity IDs.\n" +
+                  "Use the **Scene Explorer** mod to inspect an ID."
                 },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),

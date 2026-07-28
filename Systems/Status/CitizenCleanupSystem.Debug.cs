@@ -1,17 +1,18 @@
-// CitizenCleanupSystem.Debug.cs
-using System;
-using System.Text;
-using Game.Citizens;
-using Game.Simulation;
-using Unity.Collections;
-using Unity.Entities;
-
 namespace CitizenCleaner
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using Game.Citizens;
+    using Game.Simulation;
+    using Unity.Collections;
+    using Unity.Entities;
+
     public partial class CitizenCleanupSystem
     {
         private const int kCorruptSampleLimit = 25;
         private const int kOtherSampleLimit = 10;
+        private const int kMismatchSampleLimit = 15;
 
         public readonly struct CitizenCountSnapshot
         {
@@ -48,6 +49,13 @@ namespace CitizenCleaner
             public int MovingAway;
             public int Commuters;
             public int Homeless;
+            public int HomelessHouseholdMembers;
+            public int HomelessMissingCitizen;
+            public int HomelessTourist;
+            public int HomelessCommuter;
+            public int HomelessInvalidCitizen;
+            public int HomelessDead;
+            public int HomelessMissingFlag;
         }
 
         public CitizenCountSnapshot GetCitizenCountSnapshot()
@@ -115,21 +123,28 @@ namespace CitizenCleaner
                 new NativeList<Entity>(kOtherSampleLimit, Allocator.Temp);
             using NativeList<Entity> homeless =
                 new NativeList<Entity>(kOtherSampleLimit, Allocator.Temp);
+            List<string> homelessMismatchIds =
+                new List<string>(kMismatchSampleLimit);
 
             DiagnosticCitizenCounts diagnosticCounts =
                 CollectDiagnosticCitizenSamples(
                     corrupt,
                     movingAway,
                     commuters,
-                    homeless);
+                    homeless,
+                    homelessMismatchIds);
 
-            CitizenCountSnapshot citizenCounts = GetCitizenCountSnapshot();
+            CitizenCountSnapshot gameCounts = GetCitizenCountSnapshot();
             CitizenVehicleStatusSystem.Snapshot? vehicleSnapshot = null;
 
             try
             {
                 if (Mod.VehicleStatusSystem != null)
-                    vehicleSnapshot = Mod.VehicleStatusSystem.BuildSnapshot();
+                {
+                    vehicleSnapshot =
+                        Mod.VehicleStatusSystem.BuildSnapshot(
+                            collectSamples: true);
+                }
             }
             catch (Exception ex)
             {
@@ -138,50 +153,23 @@ namespace CitizenCleaner
                     $"{ex.GetType().Name}: {ex.Message}");
             }
 
-            StringBuilder report = new StringBuilder(4096);
+            StringBuilder report = new StringBuilder(8192);
             report.AppendLine();
             report.AppendLine("============================================================");
             report.AppendLine(
                 string.Format(
                     ReportText(
                         "Header",
-                        "CITIZEN CLEANER — DIAGNOSTIC REPORT\nGenerated: {0}"),
+                        "CITIZEN CLEANER — LOG REPORT\nGenerated: {0}"),
                     DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
             report.AppendLine("============================================================");
             report.AppendLine();
 
-            report.AppendLine(
-                string.Format(
-                    ReportText(
-                        "CitizenCounts",
-                        "[CITIZEN COUNTS]\n" +
-                        "CC household-member entities : {0}\n" +
-                        "Game valid moved-in citizens  : {1}\n" +
-                        "Difference (CC - game)         : {2}\n" +
-                        "Game homeless citizens        : {3}\n" +
-                        "Game moving-away households   : {4}\n" +
-                        "Game commuter households      : {5}\n" +
-                        "Game tourist citizens         : {6}\n" +
-                        "CC includes every non-deleted HouseholdMember; " +
-                        "the game total includes valid moved-in citizens only."),
-                    citizenCounts.CCHouseholdMemberEntities.ToString("N0"),
-                    citizenCounts.GameValidMovedInCitizens.ToString("N0"),
-                    (citizenCounts.CCHouseholdMemberEntities -
-                     citizenCounts.GameValidMovedInCitizens)
-                    .ToString("+#,0;-#,0;0"),
-                    citizenCounts.GameHomelessCitizens.ToString("N0"),
-                    citizenCounts.GameMovingAwayHouseholds.ToString("N0"),
-                    citizenCounts.GameCommuterHouseholds.ToString("N0"),
-                    citizenCounts.GameTouristCitizens.ToString("N0")));
-
-            if (!citizenCounts.GameCountsReady)
-            {
-                report.AppendLine(ReportText(
-                    "GameCountsPending",
-                    "Game counts are still initializing."));
-            }
-
-            report.AppendLine();
+            AppendCitizenCrossCheck(report, diagnosticCounts, gameCounts);
+            AppendHomelessDiagnostics(
+                report,
+                diagnosticCounts,
+                homelessMismatchIds);
 
             report.AppendLine(ReportText(
                 "CitizenIdsHeading",
@@ -195,7 +183,7 @@ namespace CitizenCleaner
                 report,
                 ReportText(
                     "MovingAwayCitizens",
-                    "Moving-away citizens (household MovingAway + no PropertyRenter)"),
+                    "Moving-away citizens"),
                 diagnosticCounts.MovingAway,
                 movingAway);
             AppendEntitySection(
@@ -205,7 +193,7 @@ namespace CitizenCleaner
                 commuters);
             AppendEntitySection(
                 report,
-                ReportText("HomelessCitizens", "Homeless citizens"),
+                ReportText("HomelessCitizens", "Eligible homeless citizens"),
                 diagnosticCounts.Homeless,
                 homeless);
 
@@ -221,11 +209,84 @@ namespace CitizenCleaner
             s_Log.Info(report.ToString());
         }
 
+        private static void AppendCitizenCrossCheck(
+            StringBuilder report,
+            DiagnosticCitizenCounts cc,
+            CitizenCountSnapshot game)
+        {
+            report.AppendLine(ReportText(
+                "CitizenCrossCheckHeading",
+                "[CITIZEN COUNT CROSS-CHECK — GAME 1.6]"));
+            report.AppendLine(
+                $"CC total: {game.CCHouseholdMemberEntities:N0} " +
+                "household-member entities");
+            report.AppendLine(
+                $"Game total: {game.GameValidMovedInCitizens:N0} " +
+                "valid moved-in citizens");
+            report.AppendLine();
+            report.AppendLine(
+                $"Homeless: CC {cc.Homeless:N0} citizens | " +
+                $"game {game.GameHomelessCitizens:N0} valid citizens");
+            report.AppendLine(
+                $"Moving-away: CC {cc.MovingAway:N0} citizens | " +
+                $"game {game.GameMovingAwayHouseholds:N0} households");
+            report.AppendLine(
+                $"Commuters: CC {cc.Commuters:N0} citizens | " +
+                $"game {game.GameCommuterHouseholds:N0} households");
+            report.AppendLine(
+                $"Tourists: game {game.GameTouristCitizens:N0} citizens");
+            report.AppendLine(ReportText(
+                "CitizenCrossCheckNote",
+                "Game 1.6 counters use game population rules. " +
+                "CC counts cleanup candidates; moving-away and commuter " +
+                "game values count households, not citizens."));
+
+            if (!game.GameCountsReady)
+            {
+                report.AppendLine(ReportText(
+                    "GameCountsPending",
+                    "Game counts are still initializing."));
+            }
+
+            report.AppendLine();
+        }
+
+        private static void AppendHomelessDiagnostics(
+            StringBuilder report,
+            DiagnosticCitizenCounts counts,
+            List<string> mismatchIds)
+        {
+            int excluded =
+                counts.HomelessHouseholdMembers - counts.Homeless;
+
+            report.AppendLine(ReportText(
+                "HomelessCheckHeading",
+                "[HOMELESS ELIGIBILITY CHECK]"));
+            report.AppendLine(
+                $"{counts.HomelessHouseholdMembers:N0} members of " +
+                $"HomelessHousehold | {counts.Homeless:N0} eligible | " +
+                $"{excluded:N0} excluded");
+            report.AppendLine(
+                $"Excluded: {counts.HomelessDead:N0} dead | " +
+                $"{counts.HomelessInvalidCitizen:N0} invalid | " +
+                $"{counts.HomelessCommuter:N0} commuter | " +
+                $"{counts.HomelessTourist:N0} tourist | " +
+                $"{counts.HomelessMissingFlag:N0} missing Homeless flag | " +
+                $"{counts.HomelessMissingCitizen:N0} missing Citizen");
+            report.AppendLine(
+                "Excluded IDs: " +
+                (mismatchIds.Count == 0
+                    ? ReportText("None", "(none)")
+                    : string.Join(", ", mismatchIds)));
+            report.AppendLine();
+        }
+
         private DiagnosticCitizenCounts CollectDiagnosticCitizenSamples(
             NativeList<Entity> corrupt,
             NativeList<Entity> movingAway,
             NativeList<Entity> commuters,
-            NativeList<Entity> homeless)
+            NativeList<Entity> homeless,
+            List<string> homelessMismatchIds)
         {
             DiagnosticCitizenCounts counts = default;
             using NativeArray<Entity> households =
@@ -248,29 +309,89 @@ namespace CitizenCleaner
                     if (!IsEligibleCitizen(citizen))
                         continue;
 
+                    if (type == CleanupType.Homeless)
+                    {
+                        counts.HomelessHouseholdMembers++;
+                        HomelessExclusionReason reason =
+                            GetHomelessExclusionReason(citizen);
+
+                        if (reason == HomelessExclusionReason.None)
+                        {
+                            counts.Homeless++;
+                            AddSample(
+                                homeless,
+                                citizen,
+                                kOtherSampleLimit);
+                        }
+                        else
+                        {
+                            CountHomelessExclusion(ref counts, reason);
+                            if (homelessMismatchIds.Count <
+                                kMismatchSampleLimit)
+                            {
+                                homelessMismatchIds.Add(
+                                    $"{FormatIndexVersion(citizen)} ({reason})");
+                            }
+                        }
+
+                        continue;
+                    }
+
                     switch (type)
                     {
                         case CleanupType.Corrupt:
                             counts.Corrupt++;
-                            AddSample(corrupt, citizen, kCorruptSampleLimit);
+                            AddSample(
+                                corrupt,
+                                citizen,
+                                kCorruptSampleLimit);
                             break;
                         case CleanupType.MovingAway:
                             counts.MovingAway++;
-                            AddSample(movingAway, citizen, kOtherSampleLimit);
+                            AddSample(
+                                movingAway,
+                                citizen,
+                                kOtherSampleLimit);
                             break;
                         case CleanupType.Commuters:
                             counts.Commuters++;
-                            AddSample(commuters, citizen, kOtherSampleLimit);
-                            break;
-                        case CleanupType.Homeless:
-                            counts.Homeless++;
-                            AddSample(homeless, citizen, kOtherSampleLimit);
+                            AddSample(
+                                commuters,
+                                citizen,
+                                kOtherSampleLimit);
                             break;
                     }
                 }
             }
 
             return counts;
+        }
+
+        private static void CountHomelessExclusion(
+            ref DiagnosticCitizenCounts counts,
+            HomelessExclusionReason reason)
+        {
+            switch (reason)
+            {
+                case HomelessExclusionReason.MissingCitizen:
+                    counts.HomelessMissingCitizen++;
+                    break;
+                case HomelessExclusionReason.Tourist:
+                    counts.HomelessTourist++;
+                    break;
+                case HomelessExclusionReason.Commuter:
+                    counts.HomelessCommuter++;
+                    break;
+                case HomelessExclusionReason.InvalidCitizen:
+                    counts.HomelessInvalidCitizen++;
+                    break;
+                case HomelessExclusionReason.Dead:
+                    counts.HomelessDead++;
+                    break;
+                case HomelessExclusionReason.MissingHomelessFlag:
+                    counts.HomelessMissingFlag++;
+                    break;
+            }
         }
 
         private static void AddSample(
@@ -289,13 +410,7 @@ namespace CitizenCleaner
             NativeList<Entity> samples)
         {
             report.AppendLine(
-                string.Format(
-                    ReportText(
-                        "EntitySampleSummary",
-                        "{0}: {1} total | {2} IDs"),
-                    title,
-                    total.ToString("N0"),
-                    samples.Length.ToString("N0")));
+                $"{title}: {total:N0} total | {samples.Length:N0} IDs");
             report.Append(ReportText("IdsLabel", "IDs: "));
 
             if (samples.Length == 0)
@@ -321,94 +436,161 @@ namespace CitizenCleaner
             StringBuilder report,
             CitizenVehicleStatusSystem.Snapshot vehicles)
         {
+            report.AppendLine("[PERSONAL VEHICLES]");
+            report.AppendLine();
+            report.AppendLine("[PERSONAL CARS]");
             report.AppendLine(
-                string.Format(
-                    ReportText(
-                        "PersonalCars",
-                        "[PERSONAL CARS — bicycles excluded]\n" +
-                        "{0} active | {1} parked | {2} total | {3} other\n" +
-                        "Parked: {4} street | {5} facility ({6} hidden) | " +
-                        "{7} OC hidden | {8} other ({9} hidden)"),
-                    vehicles.CarActive.ToString("N0"),
-                    vehicles.CarParked.ToString("N0"),
-                    vehicles.CarTotal.ToString("N0"),
-                    vehicles.CarTransitioning.ToString("N0"),
-                    vehicles.CarParkedOnStreet.ToString("N0"),
-                    vehicles.CarParkedAtFacility.ToString("N0"),
-                    vehicles.CarHiddenAtFacility.ToString("N0"),
-                    vehicles.CarHiddenAtOutsideConnection.ToString("N0"),
-                    vehicles.CarParkedOther.ToString("N0"),
-                    vehicles.CarHiddenOther.ToString("N0")));
+                $"{vehicles.CarActive:N0} active | " +
+                $"{vehicles.CarParked:N0} parked | " +
+                $"{vehicles.CarTransitioning:N0} transitioning | " +
+                $"{vehicles.CarTotal:N0} total");
+            report.AppendLine(
+                $"{vehicles.CarDummyTraffic:N0} DummyTraffic");
+            report.AppendLine();
+
+            report.AppendLine("[PARKED LOCATIONS]");
+            report.AppendLine(
+                $"{vehicles.CarParkedOnStreet:N0} street | " +
+                $"{vehicles.CarParkedAtFacility:N0} facility " +
+                $"({vehicles.CarHiddenAtFacility:N0} hidden) | " +
+                $"{vehicles.CarHiddenAtOutsideConnection:N0} at OC | " +
+                $"{vehicles.CarParkedOther:N0} other");
+            report.AppendLine(
+                $"Other: {vehicles.CarOtherLaneNull:N0} null lane | " +
+                $"{vehicles.CarOtherHiddenParkingLane:N0} hidden ParkingLane | " +
+                $"{vehicles.CarOtherHiddenNonParkingLane:N0} hidden other lane | " +
+                $"{vehicles.CarOtherVisibleNonParkingLane:N0} visible other lane");
+            report.AppendLine();
+
+            report.AppendLine("[CARS AT OUTSIDE CONNECTION]");
+            report.AppendLine(
+                $"Owners: {vehicles.CarOcHiddenCityHouseholdOwner:N0} city | " +
+                $"{vehicles.CarOcHiddenHouseholdAtOutsideConnection:N0} " +
+                "household at OC | " +
+                $"{vehicles.CarOcHiddenDirectOutsideConnectionOwner:N0} " +
+                "direct OC owner | " +
+                $"{vehicles.CarOcHiddenNonResidentOrMovingOwner:N0} away | " +
+                $"{vehicles.CarOcHiddenMissingOrNonHouseholdOwner:N0} missing");
+            report.AppendLine(
+                $"DummyTraffic: {vehicles.CarOcHiddenDummyTraffic:N0} total | " +
+                $"{vehicles.CarOcHiddenDirectOwnerDummyTraffic:N0} " +
+                "with direct OC owner");
+            report.AppendLine(
+                $"Location evidence: " +
+                $"{vehicles.CarOcHiddenLaneAtOutsideConnection:N0} lane at OC | " +
+                $"{vehicles.CarOcHiddenTripSourceAtOutsideConnection:N0} " +
+                "TripSource at OC | " +
+                $"{vehicles.CarOcHiddenTripSourceWithoutLane:N0} " +
+                "TripSource at OC with null lane");
+            report.AppendLine(
+                $"Trip state: {vehicles.CarOcHiddenHomeTarget:N0} HomeTarget | " +
+                $"{vehicles.CarOcHiddenKeeperAtOutsideConnection:N0} keeper at OC");
+            report.AppendLine();
+
+            report.AppendLine("[POSSIBLE ORPHANS]");
+            report.AppendLine(
+                $"{vehicles.CarOwnershipMismatch:N0} total | " +
+                $"{vehicles.CarMissingOwner:N0} missing Owner | " +
+                $"{vehicles.CarOwnerMissingBuffer:N0} owner missing buffer | " +
+                $"{vehicles.CarOwnerMissingBacklink:N0} backlink missing");
+            report.AppendLine(
+                "The game validates personal-vehicle ownership every 1,024 " +
+                "simulation ticks, processing one of 16 update groups each run. " +
+                "Zero or a small temporary count is expected.");
+            report.AppendLine();
+
+            report.AppendLine("[BICYCLE GROUP]");
+            report.AppendLine(
+                $"{vehicles.BicycleActive:N0} active | " +
+                $"{vehicles.BicycleParked:N0} parked | " +
+                $"{vehicles.BicycleTransitioning:N0} transitioning | " +
+                $"{vehicles.BicycleTotal:N0} total");
+            report.AppendLine(
+                $"{vehicles.BicycleVisibleParked:N0} visible parked | " +
+                $"{vehicles.BicycleHiddenAtOutsideConnection:N0} at OC | " +
+                $"{vehicles.BicycleHiddenOther:N0} hidden elsewhere | " +
+                $"{vehicles.BicycleOwnershipMismatch:N0} keeper mismatches");
+            report.AppendLine();
+
+            report.AppendLine("[TRAILERS]");
+            report.AppendLine(
+                $"{vehicles.TrailerTotal:N0} total | " +
+                $"{vehicles.TrailerHidden:N0} hidden | " +
+                $"{vehicles.TrailerMissingController:N0} missing controller");
             report.AppendLine();
 
             report.AppendLine(
-                string.Format(
-                    ReportText(
-                        "PossibleOrphans",
-                        "[POSSIBLE ORPHANS]\n" +
-                        "{0} total | {1} missing Owner | " +
-                        "{2} missing OwnedVehicle buffer | {3} missing backlink\n" +
-                        "Parked: {4} street | {5} facility | " +
-                        "{6} OC hidden | {7} other"),
-                    vehicles.CarOwnershipMismatch.ToString("N0"),
-                    vehicles.CarMissingOwner.ToString("N0"),
-                    vehicles.CarOwnerMissingBuffer.ToString("N0"),
-                    vehicles.CarOwnerMissingBacklink.ToString("N0"),
-                    vehicles.CarStreetOwnershipMismatch.ToString("N0"),
-                    vehicles.CarFacilityOwnershipMismatch.ToString("N0"),
-                    vehicles.CarOcHiddenOwnershipMismatch.ToString("N0"),
-                    vehicles.CarOtherParkedOwnershipMismatch.ToString("N0")));
+                "[VEHICLE ENTITY IDs — use Scene Explorer; Index:Version]");
+            AppendEntityArray(
+                report,
+                "Cars at OC",
+                vehicles.CarOcHiddenSamples);
+            AppendEntityArray(
+                report,
+                "Direct OC owner",
+                vehicles.CarOcHiddenDirectOwnerSamples);
+            AppendEntityArray(
+                report,
+                "Away owner at OC",
+                vehicles.CarOcHiddenNonResidentSamples);
+            AppendEntityArray(
+                report,
+                "Missing/non-household owner at OC",
+                vehicles.CarOcHiddenMissingOwnerSamples);
+            AppendEntityArray(
+                report,
+                "Parked Other",
+                vehicles.CarParkedOtherSamples);
+            AppendEntityArray(
+                report,
+                "Parked with null lane",
+                vehicles.CarParkedLaneNullSamples);
+            AppendEntityArray(
+                report,
+                "Ownership mismatch",
+                vehicles.CarOwnershipMismatchSamples);
+            AppendEntityArray(
+                report,
+                "Trailer missing controller",
+                vehicles.TrailerMissingControllerSamples);
             report.AppendLine();
 
+            report.AppendLine("[LOCATION DEFINITIONS]");
             report.AppendLine(
-                string.Format(
-                    ReportText(
-                        "OcHiddenCars",
-                        "[OC-HIDDEN CARS]\n" +
-                        "Owners: {0} city household | {1} household at OC | " +
-                        "{2} direct OC entity | {3} nonresident/moving | " +
-                        "{4} missing/non-household\n" +
-                        "Evidence: {5} parked lane at OC | {6} TripSource at OC | " +
-                        "{7} TripSource at OC without lane\n" +
-                        "Trip state: {8} HomeTarget | {9} keeper at OC"),
-                    vehicles.CarOcHiddenCityHouseholdOwner.ToString("N0"),
-                    vehicles.CarOcHiddenHouseholdAtOutsideConnection.ToString("N0"),
-                    vehicles.CarOcHiddenDirectOutsideConnectionOwner.ToString("N0"),
-                    vehicles.CarOcHiddenNonResidentOrMovingOwner.ToString("N0"),
-                    vehicles.CarOcHiddenMissingOrNonHouseholdOwner.ToString("N0"),
-                    vehicles.CarOcHiddenLaneAtOutsideConnection.ToString("N0"),
-                    vehicles.CarOcHiddenTripSourceAtOutsideConnection.ToString("N0"),
-                    vehicles.CarOcHiddenTripSourceWithoutLane.ToString("N0"),
-                    vehicles.CarOcHiddenHomeTarget.ToString("N0"),
-                    vehicles.CarOcHiddenKeeperAtOutsideConnection.ToString("N0")));
-            report.AppendLine();
-
+                "Street = visible ParkedCar on a ParkingLane, excluding facilities.");
             report.AppendLine(
-                string.Format(
-                    ReportText(
-                        "Bicycles",
-                        "[BICYCLES]\n" +
-                        "{0} active | {1} parked | {2} total | {3} other\n" +
-                        "Parked: {4} visible | {5} OC hidden | " +
-                        "{6} hidden elsewhere\nKeeper mismatches: {7}"),
-                    vehicles.BicycleActive.ToString("N0"),
-                    vehicles.BicycleParked.ToString("N0"),
-                    vehicles.BicycleTotal.ToString("N0"),
-                    vehicles.BicycleTransitioning.ToString("N0"),
-                    vehicles.BicycleVisibleParked.ToString("N0"),
-                    vehicles.BicycleHiddenAtOutsideConnection.ToString("N0"),
-                    vehicles.BicycleHiddenOther.ToString("N0"),
-                    vehicles.BicycleOwnershipMismatch.ToString("N0")));
+                "Facility = lane owner chain reaches a building, garage, or parking facility.");
+            report.AppendLine(
+                "At OC = hidden ParkedCar whose lane or TripSource reaches an Outside Connection.");
+            report.AppendLine(
+                "Other = parked car not matched above; subcounts and IDs show why.");
+            report.AppendLine(
+                "Direct OC owners marked DummyTraffic are game-created traffic, not resident-owned cars.");
             report.AppendLine();
+        }
 
-            report.AppendLine(ReportText(
-                "Definitions",
-                "[DEFINITIONS]\n" +
-                "Street: visible ParkedCar on ParkingLane, excluding facilities.\n" +
-                "Facility: parked lane owned by a garage, parking facility, or building.\n" +
-                "OC hidden: ParkedCar + Unspawned linked to an outside connection.\n" +
-                "Ownership mismatches can be temporary; " +
-                "location alone does not prove abandonment."));
+        private static void AppendEntityArray(
+            StringBuilder report,
+            string title,
+            Entity[]? samples)
+        {
+            report.Append(title);
+            report.Append(": ");
+
+            if (samples == null || samples.Length == 0)
+            {
+                report.AppendLine(ReportText("None", "(none)"));
+                return;
+            }
+
+            for (int i = 0; i < samples.Length; i++)
+            {
+                if (i > 0)
+                    report.Append(", ");
+
+                report.Append(FormatIndexVersion(samples[i]));
+            }
+
             report.AppendLine();
         }
 

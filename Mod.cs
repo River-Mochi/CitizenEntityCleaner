@@ -101,8 +101,6 @@ namespace CitizenCleaner
         // Unsubscribe event handlers and unregister Options UI
         public void OnDispose()
         {
-            log.Info(nameof(OnDispose));
-
             CCSetting? setting = Settings;
             CitizenCleanupSystem? cleanupSystem = CleanupSystem;
 

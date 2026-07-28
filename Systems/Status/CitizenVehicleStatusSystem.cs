@@ -2,6 +2,7 @@
 namespace CitizenCleaner
 {
     using System;
+    using System.Collections.Generic;
     using Game;
     using Game.Agents;
     using Game.Buildings;
@@ -19,6 +20,8 @@ namespace CitizenCleaner
     /// </summary>
     public sealed partial class CitizenVehicleStatusSystem : GameSystemBase
     {
+        private const int kVehicleSampleLimit = 15;
+
         private enum CarOwnershipIssue
         {
             None,
@@ -28,6 +31,7 @@ namespace CitizenCleaner
         }
 
         private EntityQuery m_PersonalVehicleQuery;
+        private EntityQuery m_TrailerQuery;
 
         protected override void OnCreate()
         {
@@ -39,6 +43,12 @@ namespace CitizenCleaner
                 .WithNone<Destroyed, OutOfControl>()
                 .Build();
 
+            m_TrailerQuery = SystemAPI.QueryBuilder()
+                .WithAll<Game.Vehicles.PersonalCar, CarTrailer>()
+                .WithNone<Deleted, Temp>()
+                .WithNone<Destroyed, OutOfControl>()
+                .Build();
+
             // BuildSnapshot is called directly; this system never needs an update tick.
             Enabled = false;
         }
@@ -47,7 +57,7 @@ namespace CitizenCleaner
         {
         }
 
-        public Snapshot BuildSnapshot()
+        public Snapshot BuildSnapshot(bool collectSamples = false)
         {
             ComponentLookup<Game.Vehicles.PersonalCar> personalCarLookup =
                 GetComponentLookup<Game.Vehicles.PersonalCar>(isReadOnly: true);
@@ -63,6 +73,8 @@ namespace CitizenCleaner
                 GetComponentLookup<TripSource>(isReadOnly: true);
             ComponentLookup<Owner> ownerLookup =
                 GetComponentLookup<Owner>(isReadOnly: true);
+            ComponentLookup<Controller> controllerLookup =
+                GetComponentLookup<Controller>(isReadOnly: true);
             ComponentLookup<ParkingLane> parkingLaneLookup =
                 GetComponentLookup<ParkingLane>(isReadOnly: true);
             ComponentLookup<GarageLane> garageLaneLookup =
@@ -93,6 +105,29 @@ namespace CitizenCleaner
                 GetBufferLookup<OwnedVehicle>(isReadOnly: true);
             BufferLookup<HouseholdCitizen> householdCitizenLookup =
                 GetBufferLookup<HouseholdCitizen>(isReadOnly: true);
+
+            List<Entity>? ocHiddenSamples =
+                collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
+            List<Entity>? ocDirectOwnerSamples =
+                collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
+            List<Entity>? ocNonResidentSamples =
+                collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
+            List<Entity>? ocMissingOwnerSamples =
+                collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
+            List<Entity>? parkedOtherSamples =
+                collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
+            List<Entity>? parkedLaneNullSamples =
+                collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
+            List<Entity>? ownershipMismatchSamples =
+                collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
+            List<Entity>? trailerMissingControllerSamples =
+                collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
+
+            static void AddSample(List<Entity>? samples, Entity entity)
+            {
+                if (samples != null && samples.Count < kVehicleSampleLimit)
+                    samples.Add(entity);
+            }
 
             bool IsOutsideConnectionEntity(Entity entity)
             {
@@ -267,6 +302,13 @@ namespace CitizenCleaner
 
                 snapshot.CarTotal++;
 
+                Game.Vehicles.PersonalCar personalCar =
+                    personalCarLookup[vehicle];
+                bool isDummyTraffic =
+                    (personalCar.m_State & PersonalCarFlags.DummyTraffic) != 0;
+                if (isDummyTraffic)
+                    snapshot.CarDummyTraffic++;
+
                 CarOwnershipIssue ownershipIssue =
                     GetCarOwnershipIssue(vehicle, out Entity carOwner);
                 bool hasOwnershipMismatch =
@@ -275,6 +317,7 @@ namespace CitizenCleaner
                 if (hasOwnershipMismatch)
                 {
                     snapshot.CarOwnershipMismatch++;
+                    AddSample(ownershipMismatchSamples, vehicle);
 
                     switch (ownershipIssue)
                     {
@@ -294,6 +337,12 @@ namespace CitizenCleaner
                 {
                     snapshot.CarParked++;
                     Entity lane = parkedLookup[vehicle].m_Lane;
+                    if (lane == Entity.Null)
+                    {
+                        snapshot.CarParkedLaneNull++;
+                        AddSample(parkedLaneNullSamples, vehicle);
+                    }
+
                     bool laneAtOutsideConnection =
                         IsOutsideConnectionLocation(lane);
                     bool tripSourceAtOutsideConnection =
@@ -311,6 +360,10 @@ namespace CitizenCleaner
                     if (isOutsideConnection)
                     {
                         snapshot.CarHiddenAtOutsideConnection++;
+                        AddSample(ocHiddenSamples, vehicle);
+
+                        if (isDummyTraffic)
+                            snapshot.CarOcHiddenDummyTraffic++;
 
                         if (hasOwnershipMismatch)
                             snapshot.CarOcHiddenOwnershipMismatch++;
@@ -324,9 +377,6 @@ namespace CitizenCleaner
                             if (lane == Entity.Null)
                                 snapshot.CarOcHiddenTripSourceWithoutLane++;
                         }
-
-                        Game.Vehicles.PersonalCar personalCar =
-                            personalCarLookup[vehicle];
 
                         if ((personalCar.m_State &
                              PersonalCarFlags.HomeTarget) != 0)
@@ -351,10 +401,18 @@ namespace CitizenCleaner
                         else if (IsOutsideConnectionEntity(carOwner))
                         {
                             snapshot.CarOcHiddenDirectOutsideConnectionOwner++;
+                            AddSample(ocDirectOwnerSamples, vehicle);
+
+                            if (isDummyTraffic)
+                            {
+                                snapshot
+                                    .CarOcHiddenDirectOwnerDummyTraffic++;
+                            }
                         }
                         else if (!householdLookup.HasComponent(carOwner))
                         {
                             snapshot.CarOcHiddenMissingOrNonHouseholdOwner++;
+                            AddSample(ocMissingOwnerSamples, vehicle);
                         }
                         else if (
                             commuterHouseholdLookup.HasComponent(carOwner) ||
@@ -362,6 +420,7 @@ namespace CitizenCleaner
                             movingAwayLookup.HasComponent(carOwner))
                         {
                             snapshot.CarOcHiddenNonResidentOrMovingOwner++;
+                            AddSample(ocNonResidentSamples, vehicle);
                         }
                         else if (IsHouseholdAtOutsideConnection(carOwner))
                         {
@@ -391,8 +450,28 @@ namespace CitizenCleaner
                     else
                     {
                         snapshot.CarParkedOther++;
+                        AddSample(parkedOtherSamples, vehicle);
+
                         if (isHidden)
                             snapshot.CarHiddenOther++;
+
+                        if (lane == Entity.Null)
+                        {
+                            snapshot.CarOtherLaneNull++;
+                        }
+                        else if (parkingLaneLookup.HasComponent(lane))
+                        {
+                            snapshot.CarOtherHiddenParkingLane++;
+                        }
+                        else if (isHidden)
+                        {
+                            snapshot.CarOtherHiddenNonParkingLane++;
+                        }
+                        else
+                        {
+                            snapshot.CarOtherVisibleNonParkingLane++;
+                        }
+
                         if (hasOwnershipMismatch)
                             snapshot.CarOtherParkedOwnershipMismatch++;
                     }
@@ -409,6 +488,44 @@ namespace CitizenCleaner
                 snapshot.BicycleTotal -
                 snapshot.BicycleActive -
                 snapshot.BicycleParked;
+
+            using NativeArray<Entity> trailers =
+                m_TrailerQuery.ToEntityArray(Allocator.Temp);
+
+            snapshot.TrailerTotal = trailers.Length;
+
+            for (int i = 0; i < trailers.Length; i++)
+            {
+                Entity trailer = trailers[i];
+
+                if (unspawnedLookup.HasComponent(trailer))
+                    snapshot.TrailerHidden++;
+
+                bool missingController =
+                    !controllerLookup.HasComponent(trailer) ||
+                    controllerLookup[trailer].m_Controller == Entity.Null;
+
+                if (missingController)
+                {
+                    snapshot.TrailerMissingController++;
+                    AddSample(trailerMissingControllerSamples, trailer);
+                }
+            }
+
+            snapshot.CarOcHiddenSamples = ocHiddenSamples?.ToArray();
+            snapshot.CarOcHiddenDirectOwnerSamples =
+                ocDirectOwnerSamples?.ToArray();
+            snapshot.CarOcHiddenNonResidentSamples =
+                ocNonResidentSamples?.ToArray();
+            snapshot.CarOcHiddenMissingOwnerSamples =
+                ocMissingOwnerSamples?.ToArray();
+            snapshot.CarParkedOtherSamples = parkedOtherSamples?.ToArray();
+            snapshot.CarParkedLaneNullSamples =
+                parkedLaneNullSamples?.ToArray();
+            snapshot.CarOwnershipMismatchSamples =
+                ownershipMismatchSamples?.ToArray();
+            snapshot.TrailerMissingControllerSamples =
+                trailerMissingControllerSamples?.ToArray();
             snapshot.CapturedAt = DateTime.Now;
 
             return snapshot;

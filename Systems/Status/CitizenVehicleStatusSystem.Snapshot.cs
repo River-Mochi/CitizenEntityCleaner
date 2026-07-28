@@ -1,5 +1,6 @@
 // CitizenVehicleStatusSystem.Snapshot.cs
 using System;
+using Unity.Entities;
 
 namespace CitizenCleaner
 {
@@ -18,6 +19,12 @@ namespace CitizenCleaner
             public int CarHiddenAtOutsideConnection;
             public int CarParkedOther;
             public int CarHiddenOther;
+            public int CarOtherLaneNull;
+            public int CarOtherHiddenParkingLane;
+            public int CarOtherHiddenNonParkingLane;
+            public int CarOtherVisibleNonParkingLane;
+            public int CarParkedLaneNull;
+            public int CarDummyTraffic;
 
             public int CarOwnershipMismatch;
             public int CarMissingOwner;
@@ -38,6 +45,8 @@ namespace CitizenCleaner
             public int CarOcHiddenTripSourceWithoutLane;
             public int CarOcHiddenHomeTarget;
             public int CarOcHiddenKeeperAtOutsideConnection;
+            public int CarOcHiddenDummyTraffic;
+            public int CarOcHiddenDirectOwnerDummyTraffic;
 
             public int BicycleTotal;
             public int BicycleActive;
@@ -47,6 +56,19 @@ namespace CitizenCleaner
             public int BicycleHiddenAtOutsideConnection;
             public int BicycleHiddenOther;
             public int BicycleOwnershipMismatch;
+
+            public int TrailerTotal;
+            public int TrailerHidden;
+            public int TrailerMissingController;
+
+            public Entity[]? CarOcHiddenSamples;
+            public Entity[]? CarOcHiddenDirectOwnerSamples;
+            public Entity[]? CarOcHiddenNonResidentSamples;
+            public Entity[]? CarOcHiddenMissingOwnerSamples;
+            public Entity[]? CarParkedOtherSamples;
+            public Entity[]? CarParkedLaneNullSamples;
+            public Entity[]? CarOwnershipMismatchSamples;
+            public Entity[]? TrailerMissingControllerSamples;
 
             public DateTime CapturedAt;
         }
