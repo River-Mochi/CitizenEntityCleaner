@@ -1,19 +1,19 @@
 // CitizenVehicleStatusSystem.cs
-using System;
-using Game;
-using Game.Agents;
-using Game.Buildings;
-using Game.Citizens;
-using Game.Common;
-using Game.Net;
-using Game.Objects;
-using Game.Tools;
-using Game.Vehicles;
-using Unity.Collections;
-using Unity.Entities;
-
 namespace CitizenCleaner
 {
+    using System;
+    using Game;
+    using Game.Agents;
+    using Game.Buildings;
+    using Game.Citizens;
+    using Game.Common;
+    using Game.Net;
+    using Game.Objects;
+    using Game.Tools;
+    using Game.Vehicles;
+    using Unity.Collections;
+    using Unity.Entities;
+
     /// <summary>
     /// Builds a personal-vehicle snapshot only when requested from the Options UI.
     /// </summary>
@@ -27,13 +27,13 @@ namespace CitizenCleaner
             OwnerMissingBacklink,
         }
 
-        private EntityQuery m_personalVehicleQuery;
+        private EntityQuery m_PersonalVehicleQuery;
 
         protected override void OnCreate()
         {
             base.OnCreate();
 
-            m_personalVehicleQuery = SystemAPI.QueryBuilder()
+            m_PersonalVehicleQuery = SystemAPI.QueryBuilder()
                 .WithAll<Game.Vehicles.PersonalCar>()
                 .WithNone<CarTrailer, Deleted, Temp>()
                 .WithNone<Destroyed, OutOfControl>()
@@ -209,7 +209,7 @@ namespace CitizenCleaner
             Snapshot snapshot = default;
 
             using NativeArray<Entity> vehicles =
-                m_personalVehicleQuery.ToEntityArray(Allocator.Temp);
+                m_PersonalVehicleQuery.ToEntityArray(Allocator.Temp);
 
             for (int i = 0; i < vehicles.Length; i++)
             {

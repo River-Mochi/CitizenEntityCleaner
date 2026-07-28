@@ -36,11 +36,12 @@ namespace CitizenCleaner
                 // Filter toggles
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeCorrupt)), "▪ Corrupt Citizens" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeCorrupt)),
-                  "When enabled (default), marks/counts **Corrupt** citizens.\n" +
+                  "When enabled (default), counts **Corrupt** citizens.\n" +
                   "These are citizen without PropertyRenter and are not homeless, commuters, tourists, or moving-away.\n\n" +
-                  "- Abandoned Cars: corrupt citizens and their abandoned cars are the main target of this mod.\n" +
-                  "- When citizens are cleaned up, the game should remove associated personal vehicles and free parking spaces.\n" +
-                  "- CC marks citizens for deletion; the game's cleanup systems handles remaining references (school, patients, etc.)." },
+                  "- Corrupt citizens and abandoned cars are the main target of this mod.\n" +
+                  "- When citizens are cleaned up, the game should remove related personal vehicles and free parking spaces.\n" +
+                  "- CC marks citizens for deletion; the game's cleanup systems handle vehicle, school, patient, other references.)." },
+
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ Moving-Away (Rent = 0)" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)),
@@ -92,18 +93,35 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "Citizen entities that [Cleanup Citizens] will remove, based on the selected boxes [ ✓ ]." },
 
-                // Compact vehicle status
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)), "Personal Cars" },
+                // Status Cars
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)), "Cars" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)),
-                  "Personal cars only; bicycles and trailers are excluded." },
+                    "Personal cars only; bicycle-group vehicles and trailers are reported separately.\n" +
+                    "<Active> = on a lane and not parked; it may be moving or stopped.\n" +
+                    "<Parked> = all parked personal cars.\n" +
+                    "<Total> = active, parked, and transitioning personal cars.\n" +
+                    "<Updated> = time these counts were refreshed.\n\n" +
+                    "The city simulation is paused in Options. Run the city before refreshing to see simulation changes."
+                },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarParkingDisplay)), "Parked Cars" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.PersonalCarParkingDisplay)),
-                  "Parked on streets, in parking facilities, or hidden at Outside Connections (OC)." },
+                    "<Street> = cars assigned to a street ParkingLane.\n" +
+                    "<Facility> = cars in a building, garage, or parking facility.\n" +
+                    "<OC> = hidden cars at an Outside Connection.\n" +
+                    "<Other> = parked cars not matched to those locations; not automatically abandoned.\n\n" +
+                    "Use **[LOG REPORT]**, then **[OPEN LOG]**, for full details."
+                },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OutsideConnectionOwnerDisplay)), "Hidden at OC" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OutsideConnectionOwnerDisplay)),
-                  "OC-hidden cars grouped by owner. See [Write Report] for full details." },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OutsideConnectionOwnerDisplay)),           
+                    "Hidden cars located at an Outside Connection, grouped by owner.\n" +
+                    "<City> = owner is a city household.\n" +
+                    "<OC> = owner is an Outside Connection entity, or its household is currently at an OC.\n" +
+                    "<Away> = commuter, tourist, or moving-away household.\n" +
+                    "<Missing> = no owner or owner is not a household.\n\n" +
+                    "These categories do not automatically prove abandonment."
+                },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleOwnershipDisplay)), "Possible Orphans" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.VehicleOwnershipDisplay)),
@@ -211,7 +229,6 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenDiscordButton)), "Discord" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenDiscordButton)),  "Discord chat for feedback on the mod; opens in browser." },
-
                
                 // About tab --> Usage section header & blocks
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.UsageGroup), "USAGE" },

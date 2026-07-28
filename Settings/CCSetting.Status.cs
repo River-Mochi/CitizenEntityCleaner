@@ -156,12 +156,24 @@ namespace CitizenCleaner
 
         private static string FormatCount(int value) => value.ToString("N0");
 
-        // Kept until the other locale files are aligned with the final English UI.
+        // Temporary compatibility properties until all locale files are aligned.
+        [SettingsUIHidden]
         public string CitizenCountComparisonDisplay => string.Empty;
+
+        [SettingsUIHidden]
         public string OutsideConnectionStageDisplay => string.Empty;
+
+        [SettingsUIHidden]
         public string BicycleStatusDisplay => string.Empty;
+
+        [SettingsUIHidden]
         public string BicycleParkingDisplay => string.Empty;
+
+        [SettingsUIHidden]
         public string VehicleOwnershipLocationDisplay => string.Empty;
+
+        [SettingsUIHidden]
         public string VehicleSnapshotTimeDisplay => string.Empty;
+
     }
 }

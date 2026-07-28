@@ -1,12 +1,10 @@
 namespace CitizenCleaner
 {
-    using System.Reflection;
-
+    using System.Reflection;        // only for csproj version
     using Colossal.IO.AssetDatabase;
     using Colossal.Localization;
     using Colossal.Logging;
     using Colossal.PSI.Environment;
-
     using Game;
     using Game.Modding;
     using Game.SceneFlow;
@@ -14,22 +12,23 @@ namespace CitizenCleaner
     public class Mod : IMod
     {
         private const string kLogId = "CitizenCleaner";
-        private static readonly Assembly s_asm = Assembly.GetExecutingAssembly();
-
-        private static readonly string s_versionInformationalRaw =
-            s_asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion ?? "1.0.0";
 
         private static bool s_bannerLogged;
 
         public static readonly string Name =
-            s_asm.GetCustomAttribute<AssemblyTitleAttribute>()?.Title
+            Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyTitleAttribute>()?.Title
                 ?? "Citizen Cleaner";
-        public static readonly string VersionShort =
-            s_versionInformationalRaw.Split(' ', '+')[0];
+
         public static readonly string VersionInformational =
-            s_versionInformationalRaw;
-        public static readonly ILog log = LogManager
+            Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "1.0.0";
+
+        public static readonly string VersionShort =
+            VersionInformational.Split(' ', '+')[0];
+
+        internal static readonly ILog log = LogManager
             .GetLogger(kLogId)
             .SetShowsErrorsInUI(false);
 
