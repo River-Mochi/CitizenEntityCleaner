@@ -3,6 +3,7 @@ namespace CitizenCleaner
 {
     using System.Collections.Generic;  // Dictionary
     using Colossal;                    // IDictionarySource
+    using Colossal.IO.AssetDatabase.Internal;
 
     /// <summary>
     /// English locale (en-US)
@@ -35,11 +36,11 @@ namespace CitizenCleaner
                 // Filter toggles
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeCorrupt)), "▪ Corrupt Citizens" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeCorrupt)),
-                  "When enabled (default), counts **Corrupt** citizens for [Cleanup Citizens].\n" +
-                  "These citizens belong to households without PropertyRenter and are not homeless, commuters, tourists, or moving-away.\n\n" +
+                  "When enabled (default), marks/counts **Corrupt** citizens.\n" +
+                  "These are citizen without PropertyRenter and are not homeless, commuters, tourists, or moving-away.\n\n" +
                   "- Abandoned Cars: corrupt citizens and their abandoned cars are the main target of this mod.\n" +
-                  "- When household members are cleaned up, the game should naturally remove the household's personal vehicle, thus freeing parking spaces.\n" +
-                  "- CC marks citizens for deletion; the game's cleanup systems handle remaining references." },
+                  "- When citizens are cleaned up, the game should remove associated personal vehicles and free parking spaces.\n" +
+                  "- CC marks citizens for deletion; the game's cleanup systems handles remaining references (school, patients, etc.)." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ Moving-Away (Rent = 0)" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)),
@@ -108,9 +109,9 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.VehicleOwnershipDisplay)),
                   "Cars with an ownership mismatch. A temporary count is possible while the game updates." },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogStatusReportButton)), "Write Report" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogStatusReportButton)), "Log Report" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogStatusReportButton)),
-                  "Write full citizen and vehicle details to **CitizenCleaner.log**." },
+                  "Write full citizen and vehicle details to **Logs/CitizenCleaner.log**." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogFromStatusButton)), "Open Log" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogFromStatusButton)),
@@ -233,16 +234,18 @@ namespace CitizenCleaner
                  // Debug report
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "Log Entity IDs" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
-                  "Writes Entity IDs (Index:Version) for **25 corrupt**, plus **10 moving-away, 10 commuter, and 10 homeless citizens**.\n" +
+                  "Writes Entity IDs (Index:Version) for samples of **25 corrupt**, **10 moving-away, 10 commuter, and 10 homeless citizens**.\n" +
                   "Use the **Scene Explorer** mod to inspect an Entity ID.\n" +
-                  "Also includes full citizen and personal-vehicle statistics." },
+                  "Also includes full citizen and personal-vehicle statistics.\n" +
+                  "Notepad++ or similar app is good to view log files."
+                },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
-                  "Use [Open Log], then copy an Entity ID into Scene Explorer." },
+                  "Use [Log Entity IDs], [Open Log], then copy an Entity ID into Scene Explorer mod inside the city." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogButton)), "Open Log" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogButton)),
-                  "Open **CitizenCleaner.log**." },
+                  "Opens **Logs/CitizenCleaner.log** or the Logs folder if the file is not available." },
 
             };
         }

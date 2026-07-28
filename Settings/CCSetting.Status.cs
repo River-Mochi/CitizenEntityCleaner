@@ -2,7 +2,6 @@
 namespace CitizenCleaner
 {
     using System;
-
     using Game.Settings;
 
     /// <summary>

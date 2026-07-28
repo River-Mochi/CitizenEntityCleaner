@@ -15,9 +15,11 @@ namespace CitizenCleaner
     {
         private const string kLogId = "CitizenCleaner";
         private static readonly Assembly s_asm = Assembly.GetExecutingAssembly();
+
         private static readonly string s_versionInformationalRaw =
             s_asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion ?? "1.0.0";
+
         private static bool s_bannerLogged;
 
         public static readonly string Name =
