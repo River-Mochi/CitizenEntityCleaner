@@ -1,16 +1,16 @@
 // CitizenCleanupSystem.Scan.cs
-using System;
-using Game.Agents;
-using Game.Buildings;
-using Game.Citizens;
-using Game.Common;
-using Game.Tools;
-using Unity.Collections;
-using Unity.Entities;
-using Unity.Mathematics;
-
 namespace CitizenCleaner
 {
+    using System;
+    using Game.Agents;
+    using Game.Buildings;
+    using Game.Citizens;
+    using Game.Common;
+    using Game.Tools;
+    using Unity.Collections;
+    using Unity.Entities;
+    using Unity.Mathematics;
+
     public partial class CitizenCleanupSystem
     {
         private NativeList<Entity> GetDeletionCandidates(
@@ -133,7 +133,8 @@ namespace CitizenCleaner
             return
                 EntityManager.Exists(citizen) &&
                 !EntityManager.HasComponent<Deleted>(citizen) &&
-                !EntityManager.HasComponent<Temp>(citizen);
+                !EntityManager.HasComponent<Temp>(citizen); &&
+                !EntityManager.HasComponent<Overridden>(citizen);
         }
 
         private bool IsEligibleCitizen(Entity citizen, CleanupType type)

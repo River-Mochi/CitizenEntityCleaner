@@ -1,15 +1,15 @@
 // CitizenCleanupSystem.cs
-using System;
-using Colossal.Logging;
-using Game;
-using Game.Citizens;
-using Game.Common;
-using Game.Tools;
-using Unity.Collections;
-using Unity.Entities;
-
 namespace CitizenCleaner
 {
+    using System;
+    using Colossal.Logging;
+    using Game;
+    using Game.Citizens;
+    using Game.Common;
+    using Game.Tools;
+    using Unity.Collections;
+    using Unity.Entities;
+
     /// <summary>
     /// Cleans citizen entities only when requested from the Options UI.
     /// </summary>
@@ -61,7 +61,7 @@ namespace CitizenCleaner
 
             m_householdQuery = SystemAPI.QueryBuilder()
                 .WithAll<Household, HouseholdCitizen>()
-                .WithNone<Deleted, Temp>()
+                .WithNone<Deleted, Temp, Overridden>()
                 .Build();
 
             // The UI enables this system only while a cleanup is running.
