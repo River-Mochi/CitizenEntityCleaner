@@ -1,9 +1,9 @@
-// LocaleKO.cs
+// Localization/LocaleKO.cs
 namespace CitizenCleaner
 {
     using System.Collections.Generic;  // Dictionary
-
     using Colossal;                    // IDictionarySource
+    using Colossal.IO.AssetDatabase.Internal;
 
     /// <summary>
     /// Korean locale (ko-KR)
@@ -29,16 +29,19 @@ namespace CitizenCleaner
                 // Groups
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.kFiltersGroup), "정리 대상" },
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.kButtonGroup), "작업" },
-                { m_Setting.GetOptionGroupLocaleID(CCSetting.StatusGroup), "Citizen & Vehicle Status" },
+                { m_Setting.GetOptionGroupLocaleID(CCSetting.StatusGroup), "상태" },
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.InfoGroup), "정보" },
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.DebugGroup), "디버그" },
 
                 // Filter toggles
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeCorrupt)), "▪ 손상된 시민" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeCorrupt)),
-                  "활성화(기본값)하면 **손상**된 시민을 집계하고 정리합니다.\n" +
-                  "PropertyRenter 구성요소가 없고(노숙자·통근자·이주 중이 아님) 거주 중인 시민이 대상입니다.\n\n" +
-                  "손상된 시민은 이 모드의 주요 대상입니다. 도시 내에 과도하게 존재하면 시간이 지나며 문제를 야기할 수 있습니다." },
+                  "활성화하면(기본값) **손상된** 시민을 계산합니다.\n" +
+                  "PropertyRenter가 없는 가구에 속하며 노숙자, 통근자, 관광객 또는 이주 중인 시민은 아닙니다.\n\n" +
+                  "- **방치 차량:** 손상된 시민과 방치 차량이 주요 대상입니다.\n" +
+                  "- 가구원이 남아 있지 않으면 게임이 개인 차량을 제거하고 주차 공간을 비워야 합니다.\n" +
+                  "- CC는 시민을 삭제 대상으로 표시하며 게임의 정리 시스템이 차량, 학교, 환자 및 기타 참조를 처리합니다." },
+
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ 이주 중 (Rent = 0)" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)),
@@ -50,10 +53,11 @@ namespace CitizenCleaner
                   "활성화 시, **통근자** 시민을 집계하고 정리합니다. 통근자는 이 도시에 거주하지 않지만 일하러 드나드는 사람을 의미합니다.\n\n" +
                   "통근자가 과거에 이 도시에 살았지만 노숙으로 전출되었을 수도 있습니다(게임 버전 1.2.5 기능)." },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ 홈리스" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ 노숙자" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "활성화 시, **홈리스** 시민을 집계하고 정리합니다.\n\n" +
-                  "<주의>: 홈리스를 삭제하면 알 수 없는 부작용이 발생할 수 있습니다." },
+                  "**ValidCitizen + Homeless**로 표시된 생존 시민을 계산하고 정리합니다.\n" +
+                  "사망자, 관광객, 통근자 및 ValidCitizen이 없는 시민은 제외됩니다.\n\n" +
+                  "<주의>: 노숙자 삭제는 알 수 없는 부작용을 일으킬 수 있습니다." },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "시민 정리" },
@@ -72,18 +76,7 @@ namespace CitizenCleaner
                   "모든 엔티티 개수를 갱신하여 현재 도시 통계를 표시합니다.\n" +
                   "정리 후에는 잠시 동안 게임을 일시정지 해제 상태로 두세요." },
 
-                // Read-only diagnostic report
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "진단 보고서를 로그에 쓰기" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
-                  "손상 시민 25개와 이사 중·통근자·노숙자 각각 10개의 ID, 시민 수와 차량 상태를 읽기 쉬운 보고서로 기록합니다.\n\n" +
-                  "**읽기 전용** — 아무것도 삭제하지 않습니다." },
-
-                // Sentence UNDER the button (multiline text row)
-                // LabelLocale = inline body under the button
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
-                  "한 버튼으로 전체 진단 보고서를 기록합니다. 아무것도 삭제하지 않습니다." },
-
-                // Displays
+                // Cleanup Status and Counts
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupStatusDisplay)), "상태" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CleanupStatusDisplay)),
                   "정리 상태를 표시합니다. 실행 중에는 실시간으로 갱신되며, 실행 중이 아니면 [개수 새로고침]으로 재계산하세요.\n\n" +
@@ -102,28 +95,41 @@ namespace CitizenCleaner
                   "「**정리**」를 클릭할 때 제거될 시민 엔티티 수입니다.\n\n" +
                   "선택한 체크박스 [ ✓ ] 에 따라 달라집니다." },
 
-                // New status rows (English fallback until this locale is translated)
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CitizenCountComparisonDisplay)), "Citizen Count Comparison" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)), "Personal Cars" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarParkingDisplay)), "Personal-Car Parking" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OutsideConnectionOwnerDisplay)), "OC-Hidden Car Owners" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OutsideConnectionStageDisplay)), "OC-Hidden Staging Evidence" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.BicycleStatusDisplay)), "Bicycles" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.BicycleParkingDisplay)), "Bicycle Parking" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleOwnershipDisplay)), "Potential Orphans" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleOwnershipLocationDisplay)), "Where Potential Orphans Are Parked" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleSnapshotTimeDisplay)), "Updated" },
-                { "CitizenCleaner/Status/CitizenCountRow", "CC household-member entities {0} | game valid moved-in citizens {1} | difference {2}" },
-                { "CitizenCleaner/Status/CitizenCountPendingRow", "CC household-member entities {0} | game counts are still initializing" },
-                { "CitizenCleaner/Status/CarSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
-                { "CitizenCleaner/Status/CarParkingRow", "Street {0} | building/parking facility {1} (hidden {2}) | OC hidden {3} | other {4} (hidden {5})" },
-                { "CitizenCleaner/Status/OcHiddenOwnerRow", "City household {0} | household at OC {1} | direct OC owner {2} | nonresident/moving {3} | missing/non-household {4} | ownership mismatch {5}" },
-                { "CitizenCleaner/Status/OcHiddenStageRow", "OC evidence: parked lane {0} | TripSource {1} | TripSource with no lane {2} | HomeTarget {3} | keeper at OC {4}" },
-                { "CitizenCleaner/Status/BicycleSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
-                { "CitizenCleaner/Status/BicycleParkingRow", "Visible parked {0} | OC hidden {1} | hidden elsewhere {2}" },
-                { "CitizenCleaner/Status/OwnershipRow", "Cars {0}: no Owner {1} | owner has no buffer {2} | backlink missing {3} | bicycles {4}" },
-                { "CitizenCleaner/Status/OwnershipLocationRow", "Parked mismatches: street {0} | building/parking facility {1} | OC hidden {2} | other {3}" },
-                { "CitizenCleaner/Status/CapturedAtRow", "Snapshot time {0}" },
+                // Status Cars
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "자동차" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusCars)),
+                  "개인 자동차만 표시합니다. 자전거 그룹 차량과 트레일러는 별도로 보고됩니다.\n" +
+                  "<활성> = 차선 위에 있고 주차 중이 아님. 이동 중이거나 정지해 있을 수 있습니다.\n" +
+                  "<주차> = 주차된 모든 개인 자동차.\n" +
+                  "<전체> = 활성, 주차 및 전환 중인 개인 자동차.\n" +
+                  "<업데이트> = 이 수치가 갱신된 시간.\n\n" +
+                  "옵션 화면에서는 도시 시뮬레이션이 일시 정지됩니다. 변경 사항을 보려면 도시를 실행한 뒤 갱신하세요." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusParkedCars)), "주차된 자동차" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusParkedCars)),
+                  "<도로> = 도로 ParkingLane에 보이는 상태로 주차된 자동차.\n" +
+                  "<시설> = 건물, 차고 또는 주차 시설 안의 자동차.\n" +
+                  "<OC> = 외부 연결에 숨겨진 자동차.\n" +
+                  "<기타> = 위 위치와 일치하지 않는 주차 차량. 일부는 지정된 주차 차선이 없습니다.\n" +
+                  "<차선 없음>만으로 방치 차량임을 의미하지 않습니다.\n\n" +
+                  "자세한 내용과 엔티티 ID는 **[로그 보고서]**, **[로그 열기]**를 차례로 사용하세요." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHiddenAtOc)), "OC 자동차" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHiddenAtOc)),
+                  "외부 연결에 숨겨진 자동차를 소유자별로 표시합니다.\n" +
+                  "<도시> = 소유자가 도시 가구입니다.\n" +
+                  "<OC에 있음> = 소유 가구가 현재 OC에 있습니다.\n" +
+                  "<OC 소유자> = 일반적으로 게임이 생성한 DummyTraffic이며 주민 차량이 아닙니다.\n" +
+                  "<외부> = 통근자, 관광객 또는 이주 중인 가구입니다.\n" +
+                  "<없음> = 소유자가 없거나 소유자가 가구가 아닙니다." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogStatusReportButton)), "로그 보고서" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogStatusReportButton)),
+                  "시민 및 차량 수와 예시 **엔티티 ID**를 CitizenCleaner.log에 기록합니다.\n" +
+                  "ID를 **Scene Explorer** 모드에 복사하여 검사하세요." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogFromStatusButton)), "로그 열기" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogFromStatusButton)), "**CitizenCleaner.log**를 엽니다." },
 
                 // Prompts (used by CCSetting.cs for placeholder text)
                 { "CitizenCleaner/Prompt/RefreshCounts", "[개수 새로고침] 클릭" },
@@ -131,6 +137,34 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "오류" },
                 { "CitizenCleaner/Status/Progress", "정리 진행 중… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "정리 중… {0}" },
+                { "CitizenCleaner/Status/CarSummaryRowV2", "{0} 활성 | {1} 주차 | {2} 전체 | 업데이트 {3}" },
+                { "CitizenCleaner/Status/CarParkingRowV2", "{0} 도로 | {1} 시설 | {2} OC | {3} 기타" },
+                { "CitizenCleaner/Status/OcHiddenOwnerRowV2", "{0} 도시 | {1} OC에 있음 | {2} OC 소유자 | {3} 외부 | {4} 없음" },
+
+                // Diagnostic report
+                { "CitizenCleaner/Report/Header",
+                  "CITIZEN CLEANER — 로그 보고서\n" +
+                  "생성: {0}" },
+                { "CitizenCleaner/Report/CitizenCrossCheckHeading", "[시민 수 교차 확인 — 게임 1.6]" },
+
+                { "CitizenCleaner/Report/CitizenCrossCheckNote",
+                  "게임 1.6 카운터는 진단 전용이며 CC는 자체 정리 수치를 사용합니다.\n" +
+                  "ValidCitizen은 전입 완료 인구 플래그이며 CC의 손상 시민 판정이 아닙니다.\n" +
+                  "게임의 이주 중 및 통근자 값은 가구 수이고 CC는 시민 수를 셉니다." },
+
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[노숙자 대상 조건 확인]" },
+                { "CitizenCleaner/Report/GameCountsPending", "게임 수치를 아직 초기화하고 있습니다." },
+                { "CitizenCleaner/Report/CitizenIdsHeading", "[시민 엔티티 ID — Scene Explorer 사용; Index:Version]" },
+                { "CitizenCleaner/Report/CorruptCitizens", "손상된 시민" },
+                { "CitizenCleaner/Report/MovingAwayCitizens", "이주 중인 시민(가구 MovingAway + PropertyRenter 없음)" },
+                { "CitizenCleaner/Report/CommuterCitizens", "통근 시민" },
+                { "CitizenCleaner/Report/HomelessCitizens", "대상 노숙 시민" },
+                { "CitizenCleaner/Report/IdsLabel", "ID: " },
+                { "CitizenCleaner/Report/None", "(없음)" },
+                { "CitizenCleaner/Report/VehicleSnapshotUnavailable",
+                  "[개인 차량]\n" +
+                  "차량 스냅샷을 사용할 수 없습니다.\n" },
+
 
                 // About tab fields
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.NameText)), "모드 이름" },
@@ -145,15 +179,15 @@ namespace CitizenCleaner
 #endif
 
                 // About tab links (the three external link buttons)
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenParadoxModsButton)), "Paradox Mods" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenParadoxModsButton)),  "Paradox Mods 웹사이트. 브라우저에서 열립니다." },
+
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenGithubButton)),  "GitHub" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenGithubButton)),   "이 모드의 GitHub 저장소. 브라우저에서 열립니다." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenDiscordButton)), "Discord" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenDiscordButton)),  "모드 피드백용 Discord. 브라우저에서 열립니다." },
-
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenParadoxModsButton)), "Paradox Mods" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenParadoxModsButton)),  "Paradox Mods 웹사이트. 브라우저에서 열립니다." },
-
+               
                 // About tab --> Usage section header & blocks
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.UsageGroup), "사용법" },
 
@@ -170,9 +204,24 @@ namespace CitizenCleaner
                   "• 이 모드는 **자동으로** 실행되지 않습니다. 제거가 필요할 때마다 **[시민 정리]** 를 사용하세요.\n" +
                   "• 예기치 않은 동작이 발생하면 원본 저장으로 되돌리세요." },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.UsageNotes)), "" },
+
+
+                 // Debug report
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "엔티티 ID 기록" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
+                  "**손상 시민 25명**, **이주 중 10명, 통근자 10명, 노숙자 10명**의 예시를 기록합니다.\n" +
+                  "의심 차량의 엔티티 ID도 기록합니다.\n" +
+                  "ID를 확인하려면 **Scene Explorer** 모드를 사용하세요." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
+                  "[엔티티 ID 기록], [로그 열기]를 누른 뒤 도시 안에서 엔티티 ID를 Scene Explorer 모드에 복사하세요." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogButton)), "로그 열기" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogButton)),
+                  "**Logs/CitizenCleaner.log**를 열며 파일이 없으면 Logs 폴더를 엽니다." },
+
             };
         }
-
         public void Unload() { }
     }
 }

@@ -1,12 +1,12 @@
-// LocaleZH_HANS.cs
+// Localization/LocaleZH_HANS.cs
 namespace CitizenCleaner
 {
     using System.Collections.Generic;  // Dictionary
-
     using Colossal;                    // IDictionarySource
+    using Colossal.IO.AssetDatabase.Internal;
 
     /// <summary>
-    /// Simplified Chinese (zh-CN) locale
+    /// Simplified Chinese locale (zh-HANS)
     /// </summary>
     public class LocaleZH_HANS : IDictionarySource
     {
@@ -18,7 +18,7 @@ namespace CitizenCleaner
         {
             return new Dictionary<string, string>
             {
-                // Mod name in Options menu list (keep Mod.Name so display stays consistent)
+                // Mod name in Options menu list
                 { m_Setting.GetSettingsLocaleID(), Mod.Name },
 
                 // Tabs
@@ -29,16 +29,19 @@ namespace CitizenCleaner
                 // Groups
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.kFiltersGroup), "清理目标" },
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.kButtonGroup), "操作" },
-                { m_Setting.GetOptionGroupLocaleID(CCSetting.StatusGroup), "Citizen & Vehicle Status" },
+                { m_Setting.GetOptionGroupLocaleID(CCSetting.StatusGroup), "状态" },
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.InfoGroup), "信息" },
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.DebugGroup), "调试" },
 
                 // Filter toggles
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeCorrupt)), "▪ 损坏的市民" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeCorrupt)),
-                  "启用（默认）后，将统计并清理**损坏的**市民；\n" +
-                  "即缺少 PropertyRenter 组件且不是无家可归者、通勤者、游客或搬离中的常住居民。\n\n" +
-                  "损坏的市民是本模组的主要清理对象；数量过多会随时间造成问题。" },
+                  "启用时（默认），统计**损坏的**市民。\n" +
+                  "这些市民属于没有 PropertyRenter 的家庭，并且不是无家可归者、通勤者、游客或正在搬离者。\n\n" +
+                  "- **废弃汽车：**损坏的市民和废弃汽车是主要清理目标。\n" +
+                  "- 当家庭中没有剩余成员时，游戏应移除其私人车辆并释放停车位。\n" +
+                  "- CC 将市民标记为删除；游戏的清理系统会处理车辆、学校、患者及其他引用。" },
+
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ 搬离中（租金 = 0）" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)),
@@ -52,8 +55,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ 无家可归者" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "启用后，将统计并清理**无家可归者**。\n\n" +
-                  "<注意>：删除无家可归者可能产生未知的副作用。" },
+                  "统计并清理带有 **ValidCitizen + Homeless** 标记的存活市民。\n" +
+                  "死亡者、游客、通勤者和缺少 ValidCitizen 的市民会被排除。\n\n" +
+                  "<请谨慎>：删除无家可归者可能导致未知副作用。" },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "清理市民" },
@@ -72,19 +76,7 @@ namespace CitizenCleaner
                   "更新所有实体计数以显示当前城市统计。\n" +
                   "清理后请让游戏继续运行一段时间。" },
 
-                // Read-only diagnostic report
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "将诊断报告写入日志" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
-                  "写入易读报告：25 个损坏市民 ID，以及搬离中、通勤者和无家可归者各 10 个 ID；还包括市民计数和车辆状态。\n\n" +
-                  "**只读** — 不会删除任何内容。" },
-
-
-                // Sentence UNDER the button (multiline)
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
-                  "一个按钮写入完整诊断报告。不会删除任何内容。" },
-
-
-                // Displays
+                // Cleanup Status and Counts
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupStatusDisplay)), "状态" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CleanupStatusDisplay)),
                   "显示清理状态。在清理进行中会实时更新；否则请点击 [刷新计数] 重新计算。\n\n" +
@@ -103,28 +95,41 @@ namespace CitizenCleaner
                   "当你点击 **[清理]** 时将要移除的市民数量，\n\n" +
                   "基于你在上方勾选的选项 [ ✓ ]。" },
 
-                // New status rows (English fallback until this locale is translated)
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CitizenCountComparisonDisplay)), "Citizen Count Comparison" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)), "Personal Cars" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarParkingDisplay)), "Personal-Car Parking" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OutsideConnectionOwnerDisplay)), "OC-Hidden Car Owners" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OutsideConnectionStageDisplay)), "OC-Hidden Staging Evidence" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.BicycleStatusDisplay)), "Bicycles" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.BicycleParkingDisplay)), "Bicycle Parking" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleOwnershipDisplay)), "Potential Orphans" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleOwnershipLocationDisplay)), "Where Potential Orphans Are Parked" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleSnapshotTimeDisplay)), "Updated" },
-                { "CitizenCleaner/Status/CitizenCountRow", "CC household-member entities {0} | game valid moved-in citizens {1} | difference {2}" },
-                { "CitizenCleaner/Status/CitizenCountPendingRow", "CC household-member entities {0} | game counts are still initializing" },
-                { "CitizenCleaner/Status/CarSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
-                { "CitizenCleaner/Status/CarParkingRow", "Street {0} | building/parking facility {1} (hidden {2}) | OC hidden {3} | other {4} (hidden {5})" },
-                { "CitizenCleaner/Status/OcHiddenOwnerRow", "City household {0} | household at OC {1} | direct OC owner {2} | nonresident/moving {3} | missing/non-household {4} | ownership mismatch {5}" },
-                { "CitizenCleaner/Status/OcHiddenStageRow", "OC evidence: parked lane {0} | TripSource {1} | TripSource with no lane {2} | HomeTarget {3} | keeper at OC {4}" },
-                { "CitizenCleaner/Status/BicycleSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
-                { "CitizenCleaner/Status/BicycleParkingRow", "Visible parked {0} | OC hidden {1} | hidden elsewhere {2}" },
-                { "CitizenCleaner/Status/OwnershipRow", "Cars {0}: no Owner {1} | owner has no buffer {2} | backlink missing {3} | bicycles {4}" },
-                { "CitizenCleaner/Status/OwnershipLocationRow", "Parked mismatches: street {0} | building/parking facility {1} | OC hidden {2} | other {3}" },
-                { "CitizenCleaner/Status/CapturedAtRow", "Snapshot time {0}" },
+                // Status Cars
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "汽车" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusCars)),
+                  "仅统计私人汽车；自行车组车辆和拖车单独报告。\n" +
+                  "<活动> = 位于车道上且未停放；可能正在行驶或停车等待。\n" +
+                  "<已停放> = 所有已停放的私人汽车。\n" +
+                  "<总计> = 活动、已停放和过渡状态的私人汽车。\n" +
+                  "<更新> = 这些数量的刷新时间。\n\n" +
+                  "打开选项时城市模拟会暂停。刷新前请先运行城市以查看变化。" },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusParkedCars)), "已停放汽车" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusParkedCars)),
+                  "<街道> = 在街道 ParkingLane 上可见的已停放汽车。\n" +
+                  "<设施> = 位于建筑、车库或停车设施内的汽车。\n" +
+                  "<OC> = 位于外部连接且被隐藏的汽车。\n" +
+                  "<其他> = 不符合上述位置的已停放汽车；部分没有分配停车车道。\n" +
+                  "<无车道> 本身并不表示汽车已被废弃。\n\n" +
+                  "使用 **[日志报告]**，然后使用 **[打开日志]** 查看详细信息和实体 ID。" },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHiddenAtOc)), "OC 汽车" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHiddenAtOc)),
+                  "位于外部连接且被隐藏的汽车，按所有者分组。\n" +
+                  "<城市> = 所有者是城市家庭。\n" +
+                  "<位于 OC> = 所有者家庭当前位于 OC。\n" +
+                  "<OC 所有者> = 通常是游戏生成的 DummyTraffic，不是居民汽车。\n" +
+                  "<外来> = 通勤、游客或正在搬离的家庭。\n" +
+                  "<缺失> = 没有所有者，或所有者不是家庭。" },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogStatusReportButton)), "日志报告" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogStatusReportButton)),
+                  "将市民和车辆数量以及示例**实体 ID** 写入 CitizenCleaner.log。\n" +
+                  "将 ID 复制到 **Scene Explorer** 模组中进行检查。" },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogFromStatusButton)), "打开日志" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogFromStatusButton)), "打开 **CitizenCleaner.log**。" },
 
                 // Prompts (used by CCSetting.cs for placeholder text)
                 { "CitizenCleaner/Prompt/RefreshCounts", "点击 [刷新计数]" },
@@ -132,6 +137,34 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "错误" },
                 { "CitizenCleaner/Status/Progress", "正在清理… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "清理中… {0}" },
+                { "CitizenCleaner/Status/CarSummaryRowV2", "{0} 活动 | {1} 已停放 | {2} 总计 | 更新 {3}" },
+                { "CitizenCleaner/Status/CarParkingRowV2", "{0} 街道 | {1} 设施 | {2} OC | {3} 其他" },
+                { "CitizenCleaner/Status/OcHiddenOwnerRowV2", "{0} 城市 | {1} 位于 OC | {2} OC 所有者 | {3} 外来 | {4} 缺失" },
+
+                // Diagnostic report
+                { "CitizenCleaner/Report/Header",
+                  "CITIZEN CLEANER — 日志报告\n" +
+                  "生成时间：{0}" },
+                { "CitizenCleaner/Report/CitizenCrossCheckHeading", "[市民数量交叉检查 — 游戏 1.6]" },
+
+                { "CitizenCleaner/Report/CitizenCrossCheckNote",
+                  "游戏 1.6 计数器仅用于诊断；CC 使用自己的清理数量。\n" +
+                  "ValidCitizen 是已迁入人口标记，不是 CC 的损坏市民判定。\n" +
+                  "游戏的搬离和通勤数值统计家庭；CC 统计市民。" },
+
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[无家可归者资格检查]" },
+                { "CitizenCleaner/Report/GameCountsPending", "游戏计数仍在初始化。" },
+                { "CitizenCleaner/Report/CitizenIdsHeading", "[市民实体 ID — 使用 Scene Explorer；索引:版本]" },
+                { "CitizenCleaner/Report/CorruptCitizens", "损坏的市民" },
+                { "CitizenCleaner/Report/MovingAwayCitizens", "正在搬离的市民（家庭 MovingAway + 无 PropertyRenter）" },
+                { "CitizenCleaner/Report/CommuterCitizens", "通勤市民" },
+                { "CitizenCleaner/Report/HomelessCitizens", "符合条件的无家可归市民" },
+                { "CitizenCleaner/Report/IdsLabel", "ID：" },
+                { "CitizenCleaner/Report/None", "（无）" },
+                { "CitizenCleaner/Report/VehicleSnapshotUnavailable",
+                  "[私人车辆]\n" +
+                  "车辆快照不可用。\n" },
+
 
                 // About tab fields
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.NameText)), "模组名称" },
@@ -146,15 +179,15 @@ namespace CitizenCleaner
 #endif
 
                 // About tab links (the three external link buttons)
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenParadoxModsButton)), "Paradox Mods" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenParadoxModsButton)),  "打开浏览器访问 Paradox Mods 页面。" },
+
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenGithubButton)),  "GitHub" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenGithubButton)),   "打开浏览器访问本模组的 GitHub 仓库。" },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenDiscordButton)), "Discord" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenDiscordButton)),  "打开浏览器加入模组反馈的 Discord 频道。" },
-
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenParadoxModsButton)), "Paradox Mods" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenParadoxModsButton)),  "打开浏览器访问 Paradox Mods 页面。" },
-
+               
                 // About tab --> Usage section header & blocks
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.UsageGroup), "用法" },
 
@@ -171,10 +204,24 @@ namespace CitizenCleaner
                   "• 本模组**不会**自动运行；每次需要移除时请手动点击 **[清理市民]**。\n" +
                   "• 如出现异常行为，请还原到原始存档。" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.UsageNotes)), "" },
+
+
+                 // Debug report
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "记录实体 ID" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
+                  "记录 **25 个损坏市民**、**10 个正在搬离、10 个通勤和 10 个无家可归市民**的示例。\n" +
+                  "还会记录可疑车辆的实体 ID。\n" +
+                  "使用 **Scene Explorer** 模组检查 ID。" },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
+                  "依次使用[记录实体 ID]、[打开日志]，然后在城市中将实体 ID 复制到 Scene Explorer 模组。" },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogButton)), "打开日志" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogButton)),
+                  "打开 **Logs/CitizenCleaner.log**；如果文件不可用，则打开 Logs 文件夹。" },
+
             };
         }
-
         public void Unload() { }
     }
 }
-

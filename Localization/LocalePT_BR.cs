@@ -1,12 +1,12 @@
-// LocalePT.cs
+// Localization/LocalePT_BR.cs
 namespace CitizenCleaner
 {
     using System.Collections.Generic;  // Dictionary
-
     using Colossal;                    // IDictionarySource
+    using Colossal.IO.AssetDatabase.Internal;
 
     /// <summary>
-    /// Portuguese (Brazil) (pt-BR)
+    /// Brazilian Portuguese locale (pt-BR)
     /// </summary>
     public class LocalePT_BR : IDictionarySource
     {
@@ -29,16 +29,19 @@ namespace CitizenCleaner
                 // Groups
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.kFiltersGroup), "Alvos da limpeza" },
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.kButtonGroup), "Ações" },
-                { m_Setting.GetOptionGroupLocaleID(CCSetting.StatusGroup), "Citizen & Vehicle Status" },
+                { m_Setting.GetOptionGroupLocaleID(CCSetting.StatusGroup), "STATUS" },
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.InfoGroup), "Informações" },
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.DebugGroup), "Depuração" },
 
                 // Filter toggles
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeCorrupt)), "▪ Cidadãos corrompidos" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeCorrupt)),
-                  "Quando ativado (padrão), conta e limpa **cidadãos corrompidos**;\n" +
-                  "residentes que não possuem o componente PropertyRenter (e que não são sem-teto, commuters, turistas ou estão mudando-se).\n\n" +
-                  "Cidadãos corrompidos são o principal alvo deste mod. Se a cidade tiver muitos, isso pode causar problemas com o tempo." },
+                  "Quando ativado (padrão), conta cidadãos **corrompidos**.\n" +
+                  "Eles pertencem a famílias sem PropertyRenter e não são sem-teto, commuters, turistas ou pessoas de mudança.\n\n" +
+                  "- **Carros abandonados:** cidadãos corrompidos e carros abandonados são o alvo principal.\n" +
+                  "- Quando nenhum membro da família permanece, o jogo deve remover o veículo pessoal e liberar a vaga.\n" +
+                  "- O CC marca cidadãos para exclusão; os sistemas de limpeza do jogo cuidam das referências a veículos, escolas, pacientes e outras." },
+
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)), "▪ Mudando-se (Aluguel = 0)" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeMovingAwayNoPR)),
@@ -52,8 +55,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Sem-teto" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "Quando ativado, conta e limpa **pessoas sem-teto**.\n\n" +
-                  "<CUIDADO>: remover sem-teto pode causar efeitos colaterais desconhecidos." },
+                  "Conta e limpa cidadãos vivos marcados como **ValidCitizen + Homeless**.\n" +
+                  "Mortos, turistas, commuters e cidadãos sem ValidCitizen são excluídos.\n\n" +
+                  "<CUIDADO>: excluir pessoas sem-teto pode causar efeitos desconhecidos." },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "Limpar cidadãos" },
@@ -72,18 +76,7 @@ namespace CitizenCleaner
                   "Atualiza todas as contagens para mostrar as estatísticas atuais da cidade.\n" +
                   "Após a limpeza, deixe o jogo rodar sem pausa por um minuto." },
 
-                // Read-only diagnostic report
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "Escrever relatório de diagnóstico" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
-                  "Escreve um relatório legível: 25 IDs corrompidos e 10 IDs de cidadãos mudando, passageiros e sem-teto; além de contagens e status de veículos.\n\n" +
-                  "**Somente leitura** — nada é excluído." },
-
-                // Sentence UNDER the button (multiline text row)
-                // LabelLocale = inline body under the button
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
-                  "Um botão escreve o relatório de diagnóstico completo. Nada é excluído." },
-
-                // Displays
+                // Cleanup Status and Counts
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupStatusDisplay)), "Status" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CleanupStatusDisplay)),
                   "Mostra o status da limpeza. Atualiza em tempo real durante uma limpeza ativa; caso contrário, pressione [Atualizar contagens] para recalcular.\n\n" +
@@ -102,28 +95,41 @@ namespace CitizenCleaner
                   "Quantidade de entidades de cidadãos que serão removidas ao clicar em **[Limpar cidadãos]**,\n\n" +
                   "com base nas caixas selecionadas [ ✓ ]." },
 
-                // New status rows (English fallback until this locale is translated)
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CitizenCountComparisonDisplay)), "Citizen Count Comparison" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarStatusDisplay)), "Personal Cars" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.PersonalCarParkingDisplay)), "Personal-Car Parking" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OutsideConnectionOwnerDisplay)), "OC-Hidden Car Owners" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OutsideConnectionStageDisplay)), "OC-Hidden Staging Evidence" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.BicycleStatusDisplay)), "Bicycles" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.BicycleParkingDisplay)), "Bicycle Parking" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleOwnershipDisplay)), "Potential Orphans" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleOwnershipLocationDisplay)), "Where Potential Orphans Are Parked" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.VehicleSnapshotTimeDisplay)), "Updated" },
-                { "CitizenCleaner/Status/CitizenCountRow", "CC household-member entities {0} | game valid moved-in citizens {1} | difference {2}" },
-                { "CitizenCleaner/Status/CitizenCountPendingRow", "CC household-member entities {0} | game counts are still initializing" },
-                { "CitizenCleaner/Status/CarSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
-                { "CitizenCleaner/Status/CarParkingRow", "Street {0} | building/parking facility {1} (hidden {2}) | OC hidden {3} | other {4} (hidden {5})" },
-                { "CitizenCleaner/Status/OcHiddenOwnerRow", "City household {0} | household at OC {1} | direct OC owner {2} | nonresident/moving {3} | missing/non-household {4} | ownership mismatch {5}" },
-                { "CitizenCleaner/Status/OcHiddenStageRow", "OC evidence: parked lane {0} | TripSource {1} | TripSource with no lane {2} | HomeTarget {3} | keeper at OC {4}" },
-                { "CitizenCleaner/Status/BicycleSummaryRow", "Total {0} | active {1} | parked {2} | transitioning/other {3}" },
-                { "CitizenCleaner/Status/BicycleParkingRow", "Visible parked {0} | OC hidden {1} | hidden elsewhere {2}" },
-                { "CitizenCleaner/Status/OwnershipRow", "Cars {0}: no Owner {1} | owner has no buffer {2} | backlink missing {3} | bicycles {4}" },
-                { "CitizenCleaner/Status/OwnershipLocationRow", "Parked mismatches: street {0} | building/parking facility {1} | OC hidden {2} | other {3}" },
-                { "CitizenCleaner/Status/CapturedAtRow", "Snapshot time {0}" },
+                // Status Cars
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "Carros" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusCars)),
+                  "Apenas carros pessoais; veículos do grupo de bicicletas e reboques são informados separadamente.\n" +
+                  "<Ativos> = estão em uma faixa e não estacionados; podem estar em movimento ou parados.\n" +
+                  "<Estacionados> = todos os carros pessoais estacionados.\n" +
+                  "<Total> = carros pessoais ativos, estacionados e em transição.\n" +
+                  "<Atualizado> = horário da atualização dos números.\n\n" +
+                  "A simulação fica pausada nas Opções. Execute a cidade antes de atualizar para ver mudanças." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusParkedCars)), "Carros estacionados" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusParkedCars)),
+                  "<Rua> = carros visíveis estacionados em uma ParkingLane da rua.\n" +
+                  "<Instalação> = carros em um edifício, garagem ou estacionamento.\n" +
+                  "<OC> = carros ocultos em uma conexão externa.\n" +
+                  "<Outros> = carros estacionados não classificados acima; alguns não têm faixa de estacionamento atribuída.\n" +
+                  "<Sem faixa> por si só não significa que o carro esteja abandonado.\n\n" +
+                  "Use **[RELATÓRIO DO LOG]** e depois **[ABRIR LOG]** para detalhes e IDs de entidades." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHiddenAtOc)), "Carros na OC" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHiddenAtOc)),
+                  "Carros ocultos em uma conexão externa, agrupados por proprietário.\n" +
+                  "<Cidade> = o proprietário é uma família da cidade.\n" +
+                  "<Na OC> = a família proprietária está atualmente em uma OC.\n" +
+                  "<Proprietário OC> = normalmente DummyTraffic criado pelo jogo, não um carro de morador.\n" +
+                  "<Fora> = família commuter, turista ou de mudança.\n" +
+                  "<Ausente> = sem proprietário ou o proprietário não é uma família." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogStatusReportButton)), "RELATÓRIO DO LOG" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogStatusReportButton)),
+                  "Grava contagens de cidadãos e veículos, além de exemplos de **IDs de entidades**, em CitizenCleaner.log.\n" +
+                  "Copie um ID para o mod **Scene Explorer** para inspecioná-lo." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogFromStatusButton)), "ABRIR LOG" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogFromStatusButton)), "Abre **CitizenCleaner.log**." },
 
                 // Prompts (used by CCSetting.cs for placeholder text)
                 { "CitizenCleaner/Prompt/RefreshCounts", "Clique em [Atualizar contagens]" },
@@ -131,6 +137,36 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "Erro" },
                 { "CitizenCleaner/Status/Progress", "Limpeza em andamento… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "Limpando… {0}" },
+                { "CitizenCleaner/Status/CarSummaryRowV2", "{0} ativos | {1} estacionados | {2} total | atualizado {3}" },
+                { "CitizenCleaner/Status/CarParkingRowV2", "{0} rua | {1} instalação | {2} OC | {3} outros" },
+                { "CitizenCleaner/Status/OcHiddenOwnerRowV2",
+                  "{0} cidade | {1} na OC | {2} proprietário OC | {3} fora | {4} ausente" },
+
+                // Diagnostic report
+                { "CitizenCleaner/Report/Header",
+                  "CITIZEN CLEANER — RELATÓRIO DO LOG\n" +
+                  "Gerado: {0}" },
+                { "CitizenCleaner/Report/CitizenCrossCheckHeading", "[COMPARAÇÃO DA CONTAGEM DE CIDADÃOS — JOGO 1.6]" },
+
+                { "CitizenCleaner/Report/CitizenCrossCheckNote",
+                  "Os contadores do jogo 1.6 são apenas diagnósticos; o CC usa sua própria contagem de limpeza.\n" +
+                  "ValidCitizen é uma marca de população que já se mudou para a cidade, não o teste de cidadãos corrompidos do CC.\n" +
+                  "O jogo conta famílias de mudança e commuters; o CC conta cidadãos." },
+
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[VERIFICAÇÃO DE ELEGIBILIDADE DOS SEM-TETO]" },
+                { "CitizenCleaner/Report/GameCountsPending", "As contagens do jogo ainda estão sendo inicializadas." },
+                { "CitizenCleaner/Report/CitizenIdsHeading",
+                  "[IDS DE ENTIDADES DE CIDADÃOS — use Scene Explorer; Índice:Versão]" },
+                { "CitizenCleaner/Report/CorruptCitizens", "Cidadãos corrompidos" },
+                { "CitizenCleaner/Report/MovingAwayCitizens", "Cidadãos de mudança (família MovingAway + sem PropertyRenter)" },
+                { "CitizenCleaner/Report/CommuterCitizens", "Cidadãos commuters" },
+                { "CitizenCleaner/Report/HomelessCitizens", "Cidadãos sem-teto elegíveis" },
+                { "CitizenCleaner/Report/IdsLabel", "IDs: " },
+                { "CitizenCleaner/Report/None", "(nenhum)" },
+                { "CitizenCleaner/Report/VehicleSnapshotUnavailable",
+                  "[VEÍCULOS PESSOAIS]\n" +
+                  "Snapshot de veículos indisponível.\n" },
+
 
                 // About tab fields
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.NameText)), "Nome do mod" },
@@ -145,15 +181,15 @@ namespace CitizenCleaner
 #endif
 
                 // About tab links (the three external link buttons)
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenParadoxModsButton)), "Paradox Mods" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenParadoxModsButton)),  "Site Paradox Mods; abre no navegador." },
+
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenGithubButton)),  "GitHub" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenGithubButton)),   "Repositório do mod no GitHub; abre no navegador." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenDiscordButton)), "Discord" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenDiscordButton)),  "Discord para feedback sobre o mod; abre no navegador." },
-
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenParadoxModsButton)), "Paradox Mods" },
-                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenParadoxModsButton)),  "Site Paradox Mods; abre no navegador." },
-
+               
                 // About tab --> Usage section header & blocks
                 { m_Setting.GetOptionGroupLocaleID(CCSetting.UsageGroup), "USO" },
 
@@ -170,9 +206,24 @@ namespace CitizenCleaner
                   "• Este mod **não** roda automaticamente; use **[Limpar cidadãos]** sempre que quiser remover.\n" +
                   "• Volte ao save original se precisar por comportamento inesperado." },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.UsageNotes)), "" },
+
+
+                 // Debug report
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "Registrar IDs de entidades" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
+                  "Registra exemplos de **25 cidadãos corrompidos**, **10 de mudança, 10 commuters e 10 sem-teto**.\n" +
+                  "Também registra IDs de entidades de veículos suspeitos.\n" +
+                  "Use o mod **Scene Explorer** para inspecionar um ID." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
+                  "Use [Registrar IDs de entidades], [Abrir log] e copie um ID de entidade para o mod Scene Explorer dentro da cidade." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogButton)), "Abrir log" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogButton)),
+                  "Abre **Logs/CitizenCleaner.log** ou a pasta Logs se o arquivo não estiver disponível." },
+
             };
         }
-
         public void Unload() { }
     }
 }

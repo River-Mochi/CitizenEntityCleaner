@@ -110,8 +110,9 @@ namespace CitizenCleaner
                     "<Street> = visible parked cars on a street ParkingLane.\n" +
                     "<Facility> = cars in a building, garage, or parking facility.\n" +
                     "<OC> = hidden cars at an Outside Connection.\n" +
-                    "<Other> = parked cars not matched above; Log Report shows details and IDs.\n\n" +
-                    "Use **[LOG REPORT]**, then **[OPEN LOG]**, for full details."
+                    "<Other> = parked cars not matched above; some have no assigned parking lane.\n" +
+                    "<No lane> alone does not mean abandoned.\n\n" +
+                    "Use **[LOG REPORT]**, then **[OPEN LOG]**, for details and Entity IDs."
                 },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHiddenAtOc)), "OC Cars" },
