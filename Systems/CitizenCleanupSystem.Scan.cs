@@ -133,8 +133,7 @@ namespace CitizenCleaner
             return
                 EntityManager.Exists(citizen) &&
                 !EntityManager.HasComponent<Deleted>(citizen) &&
-                !EntityManager.HasComponent<Temp>(citizen) &&
-                !EntityManager.HasComponent<Overridden>(citizen);
+                !EntityManager.HasComponent<Temp>(citizen);
         }
 
         private bool IsEligibleCitizen(Entity citizen, CleanupType type)

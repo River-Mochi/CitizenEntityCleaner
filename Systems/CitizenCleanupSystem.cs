@@ -61,7 +61,7 @@ namespace CitizenCleaner
 
             m_householdQuery = SystemAPI.QueryBuilder()
                 .WithAll<Household, HouseholdCitizen>()
-                .WithNone<Deleted, Temp, Overridden>()
+                .WithNone<Deleted, Temp>()
                 .Build();
 
             // The UI enables this system only while a cleanup is running.
