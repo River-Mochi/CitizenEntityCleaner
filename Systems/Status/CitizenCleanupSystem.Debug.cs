@@ -235,11 +235,14 @@ namespace CitizenCleaner
                 $"game {game.GameCommuterHouseholds:N0} households");
             report.AppendLine(
                 $"Tourists: game {game.GameTouristCitizens:N0} citizens");
+
             report.AppendLine(ReportText(
                 "CitizenCrossCheckNote",
-                "Game 1.6 counters use game population rules. " +
-                "CC counts cleanup candidates; moving-away and commuter " +
-                "game values count households, not citizens."));
+                "Game 1.6 counters are diagnostic cross-checks only; " +
+                "ValidCitizen is a moved-in population flag; " +
+                "it is not CC's corrupt-citizen test.\n" +
+                "Game moving-away and commuter values count households; " +
+                "CC counts citizen entities."));
 
             if (!game.GameCountsReady)
             {
@@ -268,7 +271,7 @@ namespace CitizenCleaner
                 $"{excluded:N0} excluded");
             report.AppendLine(
                 $"Excluded: {counts.HomelessDead:N0} dead | " +
-                $"{counts.HomelessInvalidCitizen:N0} invalid | " +
+                $"{counts.HomelessInvalidCitizen:N0} missing ValidCitizen | " +
                 $"{counts.HomelessCommuter:N0} commuter | " +
                 $"{counts.HomelessTourist:N0} tourist | " +
                 $"{counts.HomelessMissingFlag:N0} missing Homeless flag | " +
@@ -445,7 +448,7 @@ namespace CitizenCleaner
                 $"{vehicles.CarTransitioning:N0} transitioning | " +
                 $"{vehicles.CarTotal:N0} total");
             report.AppendLine(
-                $"{vehicles.CarDummyTraffic:N0} DummyTraffic");
+                $"{vehicles.CarDummyTraffic:N0} DummyTraffic personal cars");
             report.AppendLine();
 
             report.AppendLine("[PARKED LOCATIONS]");
@@ -565,7 +568,10 @@ namespace CitizenCleaner
             report.AppendLine(
                 "Other = parked car not matched above; subcounts and IDs show why.");
             report.AppendLine(
-                "Direct OC owners marked DummyTraffic are game-created traffic, not resident-owned cars.");
+                "Direct OC owner = an Outside Connection owns the car; " +
+                "if marked DummyTraffic, it is game-created through traffic, " +
+                "not a resident car.");
+
             report.AppendLine();
         }
 

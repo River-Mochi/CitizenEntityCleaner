@@ -56,7 +56,7 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Homeless" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
                   "Counts and cleans alive citizens marked **ValidCitizen + Homeless**.\n" +
-                  "Dead, tourist, commuter, and invalid citizens are excluded.\n\n" +
+                  "Dead, tourist, commuter, and missing flag ValidCitizen are excluded.\n\n" +
                   "<BE CAREFUL>: deleting homeless can cause unknown side effects." },
 
                 // Buttons
@@ -151,9 +151,12 @@ namespace CitizenCleaner
                   "CITIZEN CLEANER — LOG REPORT\nGenerated: {0}" },
                 { "CitizenCleaner/Report/CitizenCrossCheckHeading",
                   "[CITIZEN COUNT CROSS-CHECK — GAME 1.6]" },
+
                 { "CitizenCleaner/Report/CitizenCrossCheckNote",
-                  "Game 1.6 counters use game population rules. CC counts cleanup candidates; " +
-                  "moving-away and commuter game values count households, not citizens." },
+                  "Game 1.6 new counters are diagnostic cross-checks only; CC's Citizens to Clean remains the cleanup total.\n" +
+                  "ValidCitizen is a moved-in population flag; it is not CC's corrupt-citizen test.\n" +
+                  "Game's moving-away and commuter values count households; CC counts citizen entities." },
+
                 { "CitizenCleaner/Report/HomelessCheckHeading",
                   "[HOMELESS ELIGIBILITY CHECK]" },
                 { "CitizenCleaner/Report/GameCountsPending",
