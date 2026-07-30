@@ -124,7 +124,7 @@ namespace CitizenCleaner
                 (purpose == Colossal.Serialization.Entities.Purpose.NewGame ||
                  purpose == Colossal.Serialization.Entities.Purpose.LoadGame))
             {
-                m_settings?.InvalidateCitySnapshot();
+                m_settings?.ResetCitySnapshot();
             }
         }
 

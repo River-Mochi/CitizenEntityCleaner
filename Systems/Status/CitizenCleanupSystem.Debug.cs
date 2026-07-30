@@ -288,6 +288,10 @@ namespace CitizenCleaner
                 $"{counts.HomelessMissingValidNotMovedIn:N0} not moved-in | " +
                 $"{counts.HomelessMissingValidMovedInMismatch:N0} " +
                 "moved-in mismatch");
+
+            report.AppendLine(
+                "Moving-away is expected. Recheck not moved-in IDs after running the city; " +
+                "inspect moved-in mismatches in Scene Explorer.");
             report.AppendLine("Excluded samples:");
 
             if (mismatchDetails.Count == 0)

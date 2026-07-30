@@ -129,7 +129,7 @@ namespace CitizenCleaner
             RefreshEntityCounts(applyChanges: false);
         }
 
-        internal void InvalidateCitySnapshot()
+        internal void ResetCitySnapshot()
         {
             _hasInitialCitySnapshot = false;
             _showNoCity = false;
