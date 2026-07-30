@@ -133,7 +133,7 @@ namespace CitizenCleaner
             return
                 EntityManager.Exists(citizen) &&
                 !EntityManager.HasComponent<Deleted>(citizen) &&
-                !EntityManager.HasComponent<Temp>(citizen); &&
+                !EntityManager.HasComponent<Temp>(citizen) &&
                 !EntityManager.HasComponent<Overridden>(citizen);
         }
 
