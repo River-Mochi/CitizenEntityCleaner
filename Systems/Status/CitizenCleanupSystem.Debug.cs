@@ -3,6 +3,8 @@ namespace CitizenCleaner
     using System;
     using System.Collections.Generic;
     using System.Text;
+    using Game.Agents;
+    using Game.Buildings;
     using Game.Citizens;
     using Game.Simulation;
     using Unity.Collections;
@@ -53,7 +55,10 @@ namespace CitizenCleaner
             public int HomelessMissingCitizen;
             public int HomelessTourist;
             public int HomelessCommuter;
-            public int HomelessInvalidCitizen;
+            public int HomelessMissingValidCitizen;
+            public int HomelessMissingValidMovingAway;
+            public int HomelessMissingValidNotMovedIn;
+            public int HomelessMissingValidMovedInMismatch;
             public int HomelessDead;
             public int HomelessMissingFlag;
         }
@@ -123,7 +128,7 @@ namespace CitizenCleaner
                 new NativeList<Entity>(kOtherSampleLimit, Allocator.Temp);
             using NativeList<Entity> homeless =
                 new NativeList<Entity>(kOtherSampleLimit, Allocator.Temp);
-            List<string> homelessMismatchIds =
+            List<string> homelessMismatchDetails =
                 new List<string>(kMismatchSampleLimit);
 
             DiagnosticCitizenCounts diagnosticCounts =
@@ -132,7 +137,7 @@ namespace CitizenCleaner
                     movingAway,
                     commuters,
                     homeless,
-                    homelessMismatchIds);
+                    homelessMismatchDetails);
 
             CitizenCountSnapshot gameCounts = GetCitizenCountSnapshot();
             CitizenVehicleStatusSystem.Snapshot? vehicleSnapshot = null;
@@ -169,7 +174,7 @@ namespace CitizenCleaner
             AppendHomelessDiagnostics(
                 report,
                 diagnosticCounts,
-                homelessMismatchIds);
+                homelessMismatchDetails);
 
             report.AppendLine(ReportText(
                 "CitizenIdsHeading",
@@ -238,11 +243,12 @@ namespace CitizenCleaner
 
             report.AppendLine(ReportText(
                 "CitizenCrossCheckNote",
-                "Game 1.6 counters are diagnostic cross-checks only; " +
-                "ValidCitizen is a moved-in population flag; " +
-                "it is not CC's corrupt-citizen test.\n" +
-                "Game moving-away and commuter values count households; " +
-                "CC counts citizen entities."));
+                "Game 1.6 counters are diagnostic only; " +
+                "CC uses its own cleanup count.\n" +
+                "ValidCitizen is a moved-in population flag, " +
+                "not CC's corrupt-citizen test.\n" +
+                "Game moving-away and commuter counts are households; " +
+                "CC counts citizens."));
 
             if (!game.GameCountsReady)
             {
@@ -257,7 +263,7 @@ namespace CitizenCleaner
         private static void AppendHomelessDiagnostics(
             StringBuilder report,
             DiagnosticCitizenCounts counts,
-            List<string> mismatchIds)
+            List<string> mismatchDetails)
         {
             int excluded =
                 counts.HomelessHouseholdMembers - counts.Homeless;
@@ -271,16 +277,29 @@ namespace CitizenCleaner
                 $"{excluded:N0} excluded");
             report.AppendLine(
                 $"Excluded: {counts.HomelessDead:N0} dead | " +
-                $"{counts.HomelessInvalidCitizen:N0} missing ValidCitizen | " +
+                $"{counts.HomelessMissingValidCitizen:N0} missing ValidCitizen | " +
                 $"{counts.HomelessCommuter:N0} commuter | " +
                 $"{counts.HomelessTourist:N0} tourist | " +
                 $"{counts.HomelessMissingFlag:N0} missing Homeless flag | " +
                 $"{counts.HomelessMissingCitizen:N0} missing Citizen");
             report.AppendLine(
-                "Excluded IDs: " +
-                (mismatchIds.Count == 0
-                    ? ReportText("None", "(none)")
-                    : string.Join(", ", mismatchIds)));
+                $"Missing ValidCitizen members: " +
+                $"{counts.HomelessMissingValidMovingAway:N0} moving-away | " +
+                $"{counts.HomelessMissingValidNotMovedIn:N0} not moved-in | " +
+                $"{counts.HomelessMissingValidMovedInMismatch:N0} " +
+                "moved-in mismatch");
+            report.AppendLine("Excluded samples:");
+
+            if (mismatchDetails.Count == 0)
+            {
+                report.AppendLine("  " + ReportText("None", "(none)"));
+            }
+            else
+            {
+                for (int i = 0; i < mismatchDetails.Count; i++)
+                    report.AppendLine("  " + mismatchDetails[i]);
+            }
+
             report.AppendLine();
         }
 
@@ -289,7 +308,7 @@ namespace CitizenCleaner
             NativeList<Entity> movingAway,
             NativeList<Entity> commuters,
             NativeList<Entity> homeless,
-            List<string> homelessMismatchIds)
+            List<string> homelessMismatchDetails)
         {
             DiagnosticCitizenCounts counts = default;
             using NativeArray<Entity> households =
@@ -329,11 +348,22 @@ namespace CitizenCleaner
                         else
                         {
                             CountHomelessExclusion(ref counts, reason);
-                            if (homelessMismatchIds.Count <
+                            if (reason ==
+                                HomelessExclusionReason.MissingValidCitizen)
+                            {
+                                CountMissingValidCitizenState(
+                                    ref counts,
+                                    household);
+                            }
+
+                            if (homelessMismatchDetails.Count <
                                 kMismatchSampleLimit)
                             {
-                                homelessMismatchIds.Add(
-                                    $"{FormatIndexVersion(citizen)} ({reason})");
+                                homelessMismatchDetails.Add(
+                                    FormatHomelessMismatch(
+                                        citizen,
+                                        household,
+                                        reason));
                             }
                         }
 
@@ -385,8 +415,8 @@ namespace CitizenCleaner
                 case HomelessExclusionReason.Commuter:
                     counts.HomelessCommuter++;
                     break;
-                case HomelessExclusionReason.InvalidCitizen:
-                    counts.HomelessInvalidCitizen++;
+                case HomelessExclusionReason.MissingValidCitizen:
+                    counts.HomelessMissingValidCitizen++;
                     break;
                 case HomelessExclusionReason.Dead:
                     counts.HomelessDead++;
@@ -396,6 +426,70 @@ namespace CitizenCleaner
                     break;
             }
         }
+
+        private void CountMissingValidCitizenState(
+            ref DiagnosticCitizenCounts counts,
+            Entity household)
+        {
+            if (EntityManager.HasComponent<MovingAway>(household))
+            {
+                counts.HomelessMissingValidMovingAway++;
+                return;
+            }
+
+            Household householdData =
+                EntityManager.GetComponentData<Household>(household);
+
+            if ((householdData.m_Flags & HouseholdFlags.MovedIn) == 0)
+            {
+                counts.HomelessMissingValidNotMovedIn++;
+            }
+            else
+            {
+                counts.HomelessMissingValidMovedInMismatch++;
+            }
+        }
+
+        private string FormatHomelessMismatch(
+            Entity citizen,
+            Entity household,
+            HomelessExclusionReason reason)
+        {
+            Household householdData =
+                EntityManager.GetComponentData<Household>(household);
+            bool movedIn =
+                (householdData.m_Flags & HouseholdFlags.MovedIn) != 0;
+            bool movingAway =
+                EntityManager.HasComponent<MovingAway>(household);
+
+            string property = "no component";
+            if (EntityManager.HasComponent<PropertyRenter>(household))
+            {
+                property = FormatOptionalEntity(
+                    EntityManager.GetComponentData<PropertyRenter>(household)
+                        .m_Property);
+            }
+
+            string tempHome = "none";
+            if (EntityManager.HasComponent<HomelessHousehold>(household))
+            {
+                tempHome = FormatOptionalEntity(
+                    EntityManager.GetComponentData<HomelessHousehold>(household)
+                        .m_TempHome);
+            }
+
+            return
+                $"{FormatIndexVersion(citizen)} | {reason} | " +
+                $"household {FormatIndexVersion(household)} | " +
+                $"MovedIn {FormatYesNo(movedIn)} | " +
+                $"MovingAway {FormatYesNo(movingAway)} | " +
+                $"property {property} | temp home {tempHome}";
+        }
+
+        private static string FormatOptionalEntity(Entity entity) =>
+            entity == Entity.Null ? "none" : FormatIndexVersion(entity);
+
+        private static string FormatYesNo(bool value) => value ? "yes" : "no";
 
         private static void AddSample(
             NativeList<Entity> samples,
@@ -459,7 +553,8 @@ namespace CitizenCleaner
                 $"{vehicles.CarHiddenAtOutsideConnection:N0} at OC | " +
                 $"{vehicles.CarParkedOther:N0} other");
             report.AppendLine(
-                $"Other: {vehicles.CarOtherLaneNull:N0} null lane | " +
+                $"Other: {vehicles.CarOtherLaneNull:N0} " +
+                "unlocated (null lane) | " +
                 $"{vehicles.CarOtherHiddenParkingLane:N0} hidden ParkingLane | " +
                 $"{vehicles.CarOtherHiddenNonParkingLane:N0} hidden other lane | " +
                 $"{vehicles.CarOtherVisibleNonParkingLane:N0} visible other lane");
@@ -546,7 +641,7 @@ namespace CitizenCleaner
                 vehicles.CarParkedOtherSamples);
             AppendEntityArray(
                 report,
-                "Parked with null lane",
+                "Unlocated parked (null lane)",
                 vehicles.CarParkedLaneNullSamples);
             AppendEntityArray(
                 report,
@@ -568,9 +663,15 @@ namespace CitizenCleaner
             report.AppendLine(
                 "Other = parked car not matched above; subcounts and IDs show why.");
             report.AppendLine(
-                "Direct OC owner = an Outside Connection owns the car; " +
-                "if marked DummyTraffic, it is game-created through traffic, " +
-                "not a resident car.");
+                "Null lane = ParkedCar with no assigned parking lane; " +
+                "it is parked, not active or transitioning.");
+            report.AppendLine(
+                "The game can create a null lane when it cannot find a parking space; " +
+                "check ownership separately.");
+            report.AppendLine(
+                "Direct OC owner + DummyTraffic = normal game-created through traffic.");
+            report.AppendLine(
+                "Direct OC owner without DummyTraffic = unexpected; inspect its Entity ID.");
 
             report.AppendLine();
         }

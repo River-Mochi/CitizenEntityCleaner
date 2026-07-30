@@ -123,7 +123,7 @@ namespace CitizenCleaner
             MissingCitizen,
             Tourist,
             Commuter,
-            InvalidCitizen,
+            MissingValidCitizen,
             Dead,
             MissingHomelessFlag,
         }
@@ -163,7 +163,7 @@ namespace CitizenCleaner
                 return HomelessExclusionReason.Commuter;
 
             if ((citizenData.m_State & CitizenFlags.ValidCitizen) == 0)
-                return HomelessExclusionReason.InvalidCitizen;
+                return HomelessExclusionReason.MissingValidCitizen;
 
             if (EntityManager.HasComponent<HealthProblem>(citizen) &&
                 CitizenUtils.IsDead(

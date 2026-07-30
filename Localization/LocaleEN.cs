@@ -56,7 +56,7 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Homeless" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
                   "Counts and cleans alive citizens marked **ValidCitizen + Homeless**.\n" +
-                  "Dead, tourist, commuter, and missing flag ValidCitizen are excluded.\n\n" +
+                  "Dead, tourist, commuter, and citizens missing ValidCitizen are excluded.\n\n" +
                   "<BE CAREFUL>: deleting homeless can cause unknown side effects." },
 
                 // Buttons
@@ -114,12 +114,12 @@ namespace CitizenCleaner
                     "Use **[LOG REPORT]**, then **[OPEN LOG]**, for full details."
                 },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHiddenAtOc)), "Cars at OC" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHiddenAtOc)), "OC Cars" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHiddenAtOc)),
                     "Hidden cars at an Outside Connection, grouped by owner.\n" +
                     "<City> = owner is a city household.\n" +
                     "<At OC> = owner household is currently at an OC.\n" +
-                    "<OC owner> = Owner points directly to an OC; usually game-created DummyTraffic.\n" +
+                    "<OC owner> = normally game-created DummyTraffic, not a resident car.\n" +
                     "<Away> = commuter, tourist, or moving-away household.\n" +
                     "<Missing> = no owner or owner is not a household."
                 },
@@ -153,9 +153,9 @@ namespace CitizenCleaner
                   "[CITIZEN COUNT CROSS-CHECK — GAME 1.6]" },
 
                 { "CitizenCleaner/Report/CitizenCrossCheckNote",
-                  "Game 1.6 new counters are diagnostic cross-checks only; CC's Citizens to Clean remains the cleanup total.\n" +
-                  "ValidCitizen is a moved-in population flag; it is not CC's corrupt-citizen test.\n" +
-                  "Game's moving-away and commuter values count households; CC counts citizen entities." },
+                  "Game 1.6 counters are diagnostic only; CC uses its own cleanup count.\n" +
+                  "ValidCitizen is a moved-in population flag, not CC's corrupt-citizen test.\n" +
+                  "Game moving-away and commuter counts are households; CC counts citizens." },
 
                 { "CitizenCleaner/Report/HomelessCheckHeading",
                   "[HOMELESS ELIGIBILITY CHECK]" },
