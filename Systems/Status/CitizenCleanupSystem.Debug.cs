@@ -554,7 +554,7 @@ namespace CitizenCleaner
                 $"{vehicles.CarParkedOther:N0} other");
             report.AppendLine(
                 $"Other: {vehicles.CarOtherLaneNull:N0} " +
-                "unlocated (null lane) | " +
+                "no assigned parking lane (null lane) | " +
                 $"{vehicles.CarOtherHiddenParkingLane:N0} hidden ParkingLane | " +
                 $"{vehicles.CarOtherHiddenNonParkingLane:N0} hidden other lane | " +
                 $"{vehicles.CarOtherVisibleNonParkingLane:N0} visible other lane");
@@ -641,7 +641,7 @@ namespace CitizenCleaner
                 vehicles.CarParkedOtherSamples);
             AppendEntityArray(
                 report,
-                "Unlocated parked (null lane)",
+                "Parked, not assigned (null lane)",
                 vehicles.CarParkedLaneNullSamples);
             AppendEntityArray(
                 report,
@@ -662,14 +662,16 @@ namespace CitizenCleaner
                 "At OC = hidden ParkedCar whose lane or TripSource reaches an Outside Connection.");
             report.AppendLine(
                 "Other = parked car not matched above; subcounts and IDs show why.");
+
             report.AppendLine(
-                "Null lane = ParkedCar with no assigned parking lane; " +
+                "No assigned lane = ParkedCar with a null lane; " +
                 "it is parked, not active or transitioning.");
             report.AppendLine(
-                "The game can create a null lane when it cannot find a parking space; " +
-                "check ownership separately.");
-            report.AppendLine(
-                "Direct OC owner + DummyTraffic = normal game-created through traffic.");
+                "A null lane alone does not mean abandoned. Game can leave it null " +
+                "when no parking space is found; Check ownership to confirm.");
+
+           report.AppendLine(
+            "Direct OC owner + DummyTraffic = normal game-created traffic.");
             report.AppendLine(
                 "Direct OC owner without DummyTraffic = unexpected; inspect its Entity ID.");
 
