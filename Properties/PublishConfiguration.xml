@@ -8,79 +8,79 @@
 <!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
 <!--LongDescription Value="Some saves might have many abandoned Citizen entities leaving behind households, vehicles, and other entities while also decreasing performance. This mod provides a hack to manually clean those up." /-->
 <LongDescription>
-## Citizen Cleaner
+    ## Citizen Cleaner
 
-This mod allows you to instantly purge citizens that are:
+    This mod allows you to instantly purge citizens that are:
 
-- Corrupt (details below)
-- Commuters
-- Moving Away
-- Homeless
+    - Corrupt (details below)
+    - Commuters
+    - Moving Away
+    - Homeless
 
-## Performance Increase
+    ## Performance Increase
 
-If your save has "corrupt" citizen entities in large numbers, you may find:
+    If your save has "corrupt" citizen entities in large numbers, you may find:
 
-- Significant performance drops due to massive numbers of HouseholdFindSystem pathfinding queries.
-- Citizens stuck at leisure or shopping destinations, never leaving.
-- Abandoned Cars permanently occupying parking spots, never being used again. These are cleaned up as well.
-- General performance degradation across querying systems
+    - Significant performance drops due to massive numbers of HouseholdFindSystem pathfinding queries.
+    - 🙋 Citizens stuck at leisure or shopping destinations, never leaving.
+    - 🚗 Abandoned Cars permanently occupying parking spots, never being used again. These are cleaned up as well.
+    - General performance degradation across querying systems
 
-ℹ️ **Select what you want, all optional**
-- ✅ **corrupt citizens**
-- ✅ **moving-away** (that have no rent)
-- ✅ **commuters**
-- ✅ **homeless**
+    **Select what you want, all optional**
+    - ☑️ **corrupt citizens**
+    - ☑️ **moving-away** (that have no rent)
+    - ☑️ **commuters**
+    - ☑️ **homeless**
 
-ℹ️ **12 Languages**
-- English, 简体中文, 繁體中文, Français, Deutsch, Español, Italiano, 日本語, 한국어
-- Polski, Português brasileiro, Tiếng Việt.
+    ℹ️ **12 Languages**
+    - 简体中文, 繁體中文, Français, Deutsch, Español, Italiano, 日本語, 한국어
+    - Polski, Português brasileiro, Tiếng Việt.
 
-ℹ️ **This Mod may also:**
-- Cause momentary drops in population demand
-- Have other long-term consequences not fully understood
-- This mod is a work-around until the game is fixed. Use at your own risk.
-- Safe to remove anytime.
-- No performance cost to leave it installed (runs only when mod's Options menu is opened and used, then goes to sleep).
+    ℹ️ **This Mod may also:**
+    - Delete "Pending" citizens that may be buffered for relocation.
+    - Cause momentary drops in population demand.
+    - Have other long-term consequences not fully understood
+    - This mod is a work-around until the game is fixed. Use at your own risk.
+    - Safe to remove anytime. No performance cost to leave it installed (runs only when mod's Options menu is opened and used, then goes to sleep).
 
-ℹ️ **Usage**
-1. **\[Backup] your save file first!**
-2. Load the city, run for a few minutes, then open **Options → Citizen Cleaner**.
-3. **\[Refresh Counts]** click to see current statistics.
-4. Select checkbox ✅ options to include with the cleanup.
-5. \[Cleanup Citizens] click button to clean up entities.
+    ℹ️ **Usage**
+    1. **\[Backup] your save file first!**
+    2. Load the city, run for a few minutes, then open **Options → Citizen Cleaner**.
+    3. **\[Refresh Counts]** click to see current statistics.
+    4. Select checkbox ☑️ options to include with the cleanup.
+    5. \[Cleanup Citizens] click button to clean up entities.
 
-**Note**
-- This mod does **not** run automatically; it only runs when you click \[Cleanup Citizens].
-- Revert to the original saved city if you see unexpected behavior.
-- Could be left installed as there is no real in-city cost. It starts only in the Options menu when a players runs it, then it's back off.
+    **Note**
+    - This mod does **not** run automatically; it only runs when you click \[Cleanup Citizens].
+    - Revert to the original saved city if you see unexpected behavior.
+    - Could be left installed as there is no real in-city cost. It starts only in the Options menu when a players runs it, then it's back off.
 
-## What This Mod Does
+    ## What This Mod Does
 
-- Everything is optional, pick and choose which items to remove (corrupt citizens, commuters, homeless).
-- For Corrupt Citizens: the mod finds households missing "PropertyRenter" that still list members.
-- Marks these citizen entities for deletion in chunked batches.
-- The base game then naturally cleans up remaining references (households, vehicles, student/patient references, and anything else afterwards).
-- This is how the mod removes abandoned cars safely, since the game removes them naturally when we clean citizens.
-- This is a simple mod that doesn't conflict with other mods or overwrite vanilla code/systems, so it is relatively safe in that regard.
+    - Everything is optional, pick and choose which items to remove (corrupt citizens, commuters, homeless).
+    - For Corrupt Citizens: the mod finds households missing "PropertyRenter" that still list members.
+    - Marks these citizen entities for deletion in chunked batches.
+    - The base game then naturally cleans up remaining references (households, vehicles, student/patient references, and anything else afterwards).
+    - This is how the mod removes abandoned cars safely, since the game removes them naturally when we clean citizens.
+    - This is a simple mod that doesn't conflict with other mods or overwrite vanilla code/systems, so it is relatively safe in that regard.
 
-## What is causing the corruption issue?
+    ## What is causing the corruption issue?
 
-Not sure. It could be another mod or something introduced in a more recent patch.
-It seems somewhat related to the homeless and leisure bug fixes from older patches, so it may be an unintended bug introduced that only is really noticeable after long periods of simulation time.
-It's possible using Better Bulldozer on any citizens that are homeless can also put them into this state, making the problem worse.
-It could also be caused by unreachable, manually plopped buildings.
+    Not sure. It could be another mod or something introduced in a more recent patch.
+    It seems somewhat related to the homeless and leisure bug fixes from older patches, so it may be an unintended bug introduced that only is really noticeable after long periods of simulation time.
+    It's possible using Better Bulldozer on any citizens that are homeless can also put them into this state, making the problem worse.
+    It could also be caused by unreachable, manually plopped buildings.
 
-### Feedback / Bug Report:
-* Github or Discord links on the right (Citizen Cleaner channel).
+    ### Feedback / Bug Report:
+    * Click Github or Discord links on the right (see Citizen Cleaner channel).
 
-## Credits
-- phillycheeze - mod author
-- River-Mochi - testing, PR/coop development, localizations
-- yenyang - feedback, coop development
-- Konsi - feedback
-- krzychu124 - testing, feedback
-- Noel - ZH_CN editor
+    ## Credits
+    - phillycheeze - mod author
+    - River-Mochi - testing, PR/coop development, localizations
+    - yenyang - feedback, coop development
+    - Konsi - feedback
+    - krzychu124 - testing, feedback
+    - Noel - ZH_CN editor
 
 </LongDescription>
 
@@ -97,7 +97,7 @@ It could also be caused by unreachable, manually plopped buildings.
 <ForumLink Value="" />
 
 <!--Version of the mod-->
-<ModVersion Value="1.6.5" />
+<ModVersion Value="1.7.0" />
 <!--Recommended version of the base game to use the mod-->
 <GameVersion Value="1.6.*" />
 <!--Dependency for the mod, can be set multiple times-->
