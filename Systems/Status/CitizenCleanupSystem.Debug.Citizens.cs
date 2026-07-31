@@ -104,11 +104,58 @@ namespace CitizenCleaner
             report.AppendLine();
         }
 
+        private static void AppendHouseholdHousingDiagnostics(
+            StringBuilder report,
+            DiagnosticCitizenCounts counts,
+            CitizenCountSnapshot game,
+            NativeList<Entity> notMovedInWithoutProperty,
+            NativeList<Entity> propertySeekersWithoutProperty)
+        {
+            report.AppendLine(ReportText(
+                "HouseholdHousingHeading",
+                "[HOUSEHOLD HOUSING STATES]"));
+            report.AppendLine(
+                $"Game moving in: {game.GameMovingInHouseholds:N0} households | " +
+                $"moving away: {game.GameMovingAwayHouseholds:N0} households");
+            report.AppendLine(
+                $"PropertySeeker enabled: " +
+                $"{counts.NormalPropertySeekerHouseholds:N0} normal | " +
+                $"{counts.HomelessPropertySeekerHouseholds:N0} homeless households");
+            report.AppendLine(
+                $"No PropertyRenter + not MovedIn: " +
+                $"{counts.NoPropertyRenterNotMovedInHouseholds:N0} households");
+            report.AppendLine(
+                $"No PropertyRenter + PropertySeeker enabled: " +
+                $"{counts.NoPropertyRenterPropertySeekerHouseholds:N0} households");
+            report.AppendLine(ReportText(
+                "HouseholdHousingNote",
+                "These current states can overlap. PropertySeeker means searching, " +
+                "not failed. CC's current corrupt rule does not exclude them."));
+            report.AppendLine();
+
+            AppendEntitySection(
+                report,
+                ReportText(
+                    "NoRenterNotMovedInHouseholds",
+                    "Households with no PropertyRenter and not MovedIn"),
+                counts.NoPropertyRenterNotMovedInHouseholds,
+                notMovedInWithoutProperty);
+            AppendEntitySection(
+                report,
+                ReportText(
+                    "NoRenterPropertySeekerHouseholds",
+                    "Households with no PropertyRenter and PropertySeeker enabled"),
+                counts.NoPropertyRenterPropertySeekerHouseholds,
+                propertySeekersWithoutProperty);
+        }
+
         private DiagnosticCitizenCounts CollectDiagnosticCitizenSamples(
             NativeList<Entity> corrupt,
             NativeList<Entity> movingAway,
             NativeList<Entity> commuters,
             NativeList<Entity> homeless,
+            NativeList<Entity> notMovedInWithoutProperty,
+            NativeList<Entity> propertySeekersWithoutProperty,
             List<string> homelessMismatchDetails)
         {
             DiagnosticCitizenCounts counts = default;
@@ -118,6 +165,58 @@ namespace CitizenCleaner
             for (int i = 0; i < households.Length; i++)
             {
                 Entity household = households[i];
+                Household householdData =
+                    EntityManager.GetComponentData<Household>(household);
+                bool hasPropertyRenter =
+                    EntityManager.HasComponent<PropertyRenter>(household);
+                bool hasMovedIn =
+                    (householdData.m_Flags & HouseholdFlags.MovedIn) != 0;
+                bool isSeekingProperty =
+                    IsPropertySeekerEnabled(household);
+                bool isHomeless =
+                    EntityManager.HasComponent<HomelessHousehold>(household);
+                bool isCommuter =
+                    EntityManager.HasComponent<CommuterHousehold>(household);
+                bool isTourist =
+                    EntityManager.HasComponent<TouristHousehold>(household);
+                bool isMovingAway =
+                    EntityManager.HasComponent<MovingAway>(household);
+                bool isNormalHousingHousehold =
+                    !isHomeless &&
+                    !isCommuter &&
+                    !isTourist &&
+                    !isMovingAway;
+
+                if (isSeekingProperty)
+                {
+                    if (isHomeless)
+                        counts.HomelessPropertySeekerHouseholds++;
+                    else if (isNormalHousingHousehold)
+                        counts.NormalPropertySeekerHouseholds++;
+                }
+
+                if (isNormalHousingHousehold &&
+                    !hasPropertyRenter &&
+                    !hasMovedIn)
+                {
+                    counts.NoPropertyRenterNotMovedInHouseholds++;
+                    AddSample(
+                        notMovedInWithoutProperty,
+                        household,
+                        kReportSampleLimit);
+                }
+
+                if (isNormalHousingHousehold &&
+                    !hasPropertyRenter &&
+                    isSeekingProperty)
+                {
+                    counts.NoPropertyRenterPropertySeekerHouseholds++;
+                    AddSample(
+                        propertySeekersWithoutProperty,
+                        household,
+                        kReportSampleLimit);
+                }
+
                 CleanupType type = ClassifyHousehold(household);
 
                 if (type == CleanupType.None)
@@ -144,7 +243,7 @@ namespace CitizenCleaner
                             AddSample(
                                 homeless,
                                 citizen,
-                                kOtherSampleLimit);
+                                kReportSampleLimit);
                         }
                         else
                         {
@@ -158,7 +257,7 @@ namespace CitizenCleaner
                             }
 
                             if (homelessMismatchDetails.Count <
-                                kMismatchSampleLimit)
+                                kReportSampleLimit)
                             {
                                 homelessMismatchDetails.Add(
                                     FormatHomelessMismatch(
@@ -185,20 +284,27 @@ namespace CitizenCleaner
                             AddSample(
                                 movingAway,
                                 citizen,
-                                kOtherSampleLimit);
+                                kReportSampleLimit);
                             break;
                         case CleanupType.Commuters:
                             counts.Commuters++;
                             AddSample(
                                 commuters,
                                 citizen,
-                                kOtherSampleLimit);
+                                kReportSampleLimit);
                             break;
                     }
                 }
             }
 
             return counts;
+        }
+
+        private bool IsPropertySeekerEnabled(Entity household)
+        {
+            return
+                EntityManager.HasComponent<PropertySeeker>(household) &&
+                EntityManager.IsComponentEnabled<PropertySeeker>(household);
         }
 
         private static void CountHomelessExclusion(
@@ -331,4 +437,3 @@ namespace CitizenCleaner
         }
     }
 }
-

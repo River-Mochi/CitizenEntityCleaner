@@ -56,7 +56,9 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
                   "Counts and cleans alive citizens marked **ValidCitizen + Homeless**.\n" +
                   "Dead, tourist, commuter, and citizens missing ValidCitizen are excluded.\n\n" +
-                  "<BE CAREFUL>: deleting homeless can cause unknown side effects." },
+                  "Deleting homeless changes population, workers, students, and residential demand.\n" +
+                  "More homeless households lower general demand but add a positive high-density demand factor.\n\n" +
+                  "<Back up your save first.>" },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "Cleanup Citizens" },
@@ -161,6 +163,14 @@ namespace CitizenCleaner
 
                 { "CitizenCleaner/Report/HomelessCheckHeading",
                   "[HOMELESS ELIGIBILITY CHECK]" },
+                { "CitizenCleaner/Report/HouseholdHousingHeading",
+                  "[HOUSEHOLD HOUSING STATES]" },
+                { "CitizenCleaner/Report/HouseholdHousingNote",
+                  "These current states can overlap. PropertySeeker means searching, not failed. CC's current corrupt rule does not exclude them." },
+                { "CitizenCleaner/Report/NoRenterNotMovedInHouseholds",
+                  "Households with no PropertyRenter and not MovedIn" },
+                { "CitizenCleaner/Report/NoRenterPropertySeekerHouseholds",
+                  "Households with no PropertyRenter and PropertySeeker enabled" },
                 { "CitizenCleaner/Report/GameCountsPending",
                   "Game counts are still initializing." },
                 { "CitizenCleaner/Report/CitizenIdsHeading",

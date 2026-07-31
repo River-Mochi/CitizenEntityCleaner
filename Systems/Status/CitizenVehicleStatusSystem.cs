@@ -20,7 +20,7 @@ namespace CitizenCleaner
     /// </summary>
     public sealed partial class CitizenVehicleStatusSystem : GameSystemBase
     {
-        private const int kVehicleSampleLimit = 15;
+        private const int kVehicleSampleLimit = 10;
 
         private enum CarOwnerIssue
         {
@@ -541,4 +541,3 @@ namespace CitizenCleaner
         }
     }
 }
-

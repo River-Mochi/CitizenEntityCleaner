@@ -10,15 +10,16 @@ namespace CitizenCleaner
 
     public partial class CitizenCleanupSystem
     {
+        // Corrupt gets extra IDs; every other report sample stays short.
         private const int kCorruptSampleLimit = 25;
-        private const int kOtherSampleLimit = 10;
-        private const int kMismatchSampleLimit = 15;
+        private const int kReportSampleLimit = 10;
 
         public readonly struct CitizenCountSnapshot
         {
             public readonly int CCHouseholdMemberEntities;
             public readonly int GameValidMovedInCitizens;
             public readonly int GameHomelessCitizens;
+            public readonly int GameMovingInHouseholds;
             public readonly int GameMovingAwayHouseholds;
             public readonly int GameCommuterHouseholds;
             public readonly int GameTouristCitizens;
@@ -28,6 +29,7 @@ namespace CitizenCleaner
                 int ccHouseholdMemberEntities,
                 int gameValidMovedInCitizens,
                 int gameHomelessCitizens,
+                int gameMovingInHouseholds,
                 int gameMovingAwayHouseholds,
                 int gameCommuterHouseholds,
                 int gameTouristCitizens,
@@ -36,6 +38,7 @@ namespace CitizenCleaner
                 CCHouseholdMemberEntities = ccHouseholdMemberEntities;
                 GameValidMovedInCitizens = gameValidMovedInCitizens;
                 GameHomelessCitizens = gameHomelessCitizens;
+                GameMovingInHouseholds = gameMovingInHouseholds;
                 GameMovingAwayHouseholds = gameMovingAwayHouseholds;
                 GameCommuterHouseholds = gameCommuterHouseholds;
                 GameTouristCitizens = gameTouristCitizens;
@@ -59,6 +62,10 @@ namespace CitizenCleaner
             public int HomelessMissingValidMovedInMismatch;
             public int HomelessDead;
             public int HomelessMissingFlag;
+            public int NormalPropertySeekerHouseholds;
+            public int HomelessPropertySeekerHouseholds;
+            public int NoPropertyRenterNotMovedInHouseholds;
+            public int NoPropertyRenterPropertySeekerHouseholds;
         }
 
         // Game 1.6 mixes citizen + household totals, so keep each explicit.
@@ -73,7 +80,7 @@ namespace CitizenCleaner
             {
                 return new CitizenCountSnapshot(
                     ccHouseholdMemberEntities,
-                    0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0,
                     gameCountsReady: false);
             }
 
@@ -84,6 +91,7 @@ namespace CitizenCleaner
                 ccHouseholdMemberEntities,
                 data.m_MovedInCitizenCount,
                 data.m_HomelessCitizenCount,
+                data.m_MovingInHouseholdCount,
                 data.m_MovingAwayHouseholdCount,
                 data.m_CommuterHouseholdCount,
                 data.m_TouristCitizenCount,
@@ -118,13 +126,17 @@ namespace CitizenCleaner
             using NativeList<Entity> corrupt =
                 new NativeList<Entity>(kCorruptSampleLimit, Allocator.Temp);
             using NativeList<Entity> movingAway =
-                new NativeList<Entity>(kOtherSampleLimit, Allocator.Temp);
+                new NativeList<Entity>(kReportSampleLimit, Allocator.Temp);
             using NativeList<Entity> commuters =
-                new NativeList<Entity>(kOtherSampleLimit, Allocator.Temp);
+                new NativeList<Entity>(kReportSampleLimit, Allocator.Temp);
             using NativeList<Entity> homeless =
-                new NativeList<Entity>(kOtherSampleLimit, Allocator.Temp);
+                new NativeList<Entity>(kReportSampleLimit, Allocator.Temp);
+            using NativeList<Entity> notMovedInWithoutProperty =
+                new NativeList<Entity>(kReportSampleLimit, Allocator.Temp);
+            using NativeList<Entity> propertySeekersWithoutProperty =
+                new NativeList<Entity>(kReportSampleLimit, Allocator.Temp);
             List<string> homelessMismatchDetails =
-                new List<string>(kMismatchSampleLimit);
+                new List<string>(kReportSampleLimit);
 
             DiagnosticCitizenCounts diagnosticCounts =
                 CollectDiagnosticCitizenSamples(
@@ -132,6 +144,8 @@ namespace CitizenCleaner
                     movingAway,
                     commuters,
                     homeless,
+                    notMovedInWithoutProperty,
+                    propertySeekersWithoutProperty,
                     homelessMismatchDetails);
 
             CitizenCountSnapshot gameCounts = GetCitizenCountSnapshot();
@@ -166,6 +180,12 @@ namespace CitizenCleaner
             report.AppendLine();
 
             AppendCitizenCrossCheck(report, diagnosticCounts, gameCounts);
+            AppendHouseholdHousingDiagnostics(
+                report,
+                diagnosticCounts,
+                gameCounts,
+                notMovedInWithoutProperty,
+                propertySeekersWithoutProperty);
             AppendHomelessDiagnostics(
                 report,
                 diagnosticCounts,
@@ -215,4 +235,3 @@ namespace CitizenCleaner
         }
     }
 }
-
