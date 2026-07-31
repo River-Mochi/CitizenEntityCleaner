@@ -340,6 +340,7 @@ namespace CitizenCleaner
                     snapshot.CarParked++;
                     Entity lane = parkedLookup[vehicle].m_Lane;
 
+                    // Null lane alone is not abandonment; track its Unspawned overlap.
                     if (lane == Entity.Null)
                     {
                         snapshot.CarParkedLaneNull++;
@@ -404,6 +405,7 @@ namespace CitizenCleaner
                         if (carOwner == Entity.Null)
                         {
                             snapshot.CarOcHiddenMissingOrNonHouseholdOwner++;
+                            AddSample(ocMissingOwnerSamples, vehicle);
                         }
                         else if (IsOutsideConnectionEntity(carOwner))
                         {
@@ -539,3 +541,4 @@ namespace CitizenCleaner
         }
     }
 }
+
