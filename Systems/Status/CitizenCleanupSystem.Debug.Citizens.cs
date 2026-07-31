@@ -3,6 +3,7 @@ namespace CitizenCleaner
 {
     using System.Collections.Generic;
     using System.Text;
+    using Game.Agents;        // MovingAway
     using Game.Buildings;
     using Game.Citizens;
     using Unity.Collections;

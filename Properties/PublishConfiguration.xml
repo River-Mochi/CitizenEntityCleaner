@@ -37,11 +37,11 @@ If your save has "corrupt" citizen entities in large numbers, you may find:
 - Polski, Português brasileiro, Tiếng Việt.
 
 ℹ️ **This Mod may also:**
-- Delete "Pending" citizens that may be buffered for relocation
 - Cause momentary drops in population demand
 - Have other long-term consequences not fully understood
 - This mod is a work-around until the game is fixed. Use at your own risk.
-- Safe to remove anytime. No performance cost to leave it installed (runs only when mod's Options menu is opened and used, then goes to sleep).
+- Safe to remove anytime.
+- No performance cost to leave it installed (runs only when mod's Options menu is opened and used, then goes to sleep).
 
 ℹ️ **Usage**
 1. **\[Backup] your save file first!**
@@ -107,10 +107,10 @@ It could also be caused by unreachable, manually plopped buildings.
 
 <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 <ChangeLog>
-- Added compact vehicle Status and detailed Log Report (mainly from BikesAndPaths mod methods)
+- Added compact vehicle Status and detailed Log Report (methods from BikesAndPaths mod)
 - Corrected Moving-Away detection to check the household.
 - Added Traditional Chinese and Polish translations.
-- Options saved instantly to Settings file instead of waiting until Game exit.
+- Options saved instantly to Settings file instead of waiting for game exit.
 </ChangeLog>
 <!--External link, can be set multiple times. supported types are "discord", "github", "youtube", "twitch", "x", "paypal", "patreon", "buymeacoffee", "kofi", "crowdin", "gitlab", "gofundme"-->
 <ExternalLink Type="github" Url="https://github.com/phillycheeze/CitizenEntityCleaner" />
