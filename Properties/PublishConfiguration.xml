@@ -107,9 +107,9 @@ It could also be caused by unreachable, manually plopped buildings.
 
 <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 <ChangeLog>
-- Added Status report (mainly from BikesAndPaths mod methods)
-- Improved Moving-Away by household per 1.6 patch.
-- Added Traditional Chinese, and Polish translations.
+- Added compact vehicle Status and detailed Log Report (mainly from BikesAndPaths mod methods)
+- Corrected Moving-Away detection to check the household.
+- Added Traditional Chinese and Polish translations.
 - Options saved instantly to Settings file instead of waiting until Game exit.
 </ChangeLog>
 <!--External link, can be set multiple times. supported types are "discord", "github", "youtube", "twitch", "x", "paypal", "patreon", "buymeacoffee", "kofi", "crowdin", "gitlab", "gofundme"-->
