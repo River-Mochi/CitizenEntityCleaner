@@ -316,7 +316,7 @@ namespace CitizenCleaner
                     return;
                 }
 
-                // Includes citizen IDs, game counters, and vehicle status.
+                // Includes citizen IDs, game counters, vehicle status.
                 cleanupSystem.LogDiagnosticReportToLog();
             }
         }

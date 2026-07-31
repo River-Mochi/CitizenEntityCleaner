@@ -130,7 +130,7 @@ namespace CitizenCleaner
 
         private static string FormatCount(int value) => value.ToString("N0");
 
-        // Temporary aliases until the remaining locale files use the new names.
+
         [SettingsUIHidden]
         public string PersonalCarStatusDisplay => string.Empty;
 

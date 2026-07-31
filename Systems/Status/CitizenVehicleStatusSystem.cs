@@ -136,6 +136,7 @@ namespace CitizenCleaner
                      outsideObjectLookup.HasComponent(entity));
             }
 
+            // Location helpers follow short Owner chains; depth cap prevents corrupt cycles.
             bool IsOutsideConnectionLocation(Entity entity)
             {
                 Entity current = entity;
@@ -200,6 +201,7 @@ namespace CitizenCleaner
                 return false;
             }
 
+            // Match PersonalCarOwnerSystem's owner checks for cars and bicycles.
             CarOwnershipIssue GetCarOwnershipIssue(
                 Entity vehicle,
                 out Entity owner)

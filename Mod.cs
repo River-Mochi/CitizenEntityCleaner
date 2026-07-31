@@ -98,7 +98,6 @@ namespace CitizenCleaner
             CleanupSystem.OnCleanupNoWork += setting.FinishCleanupNoWork;
         }
 
-        // Unsubscribe event handlers and unregister Options UI
         public void OnDispose()
         {
             CCSetting? setting = Settings;

@@ -63,6 +63,7 @@ namespace CitizenCleaner
             public int HomelessMissingFlag;
         }
 
+        // Game 1.6 mixes citizen + household totals, so keep each explicit.
         public CitizenCountSnapshot GetCitizenCountSnapshot()
         {
             int ccHouseholdMemberEntities =
@@ -74,11 +75,7 @@ namespace CitizenCleaner
             {
                 return new CitizenCountSnapshot(
                     ccHouseholdMemberEntities,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
+                    0, 0, 0, 0, 0,
                     gameCountsReady: false);
             }
 
