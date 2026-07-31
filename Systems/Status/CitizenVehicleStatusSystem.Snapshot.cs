@@ -1,9 +1,9 @@
 // CitizenVehicleStatusSystem.Snapshot.cs
-using System;
-using Unity.Entities;
-
 namespace CitizenCleaner
 {
+    using System;
+    using Unity.Entities;
+
     public sealed partial class CitizenVehicleStatusSystem
     {
         public struct Snapshot
@@ -24,16 +24,17 @@ namespace CitizenCleaner
             public int CarOtherHiddenNonParkingLane;
             public int CarOtherVisibleNonParkingLane;
             public int CarParkedLaneNull;
+            public int CarParkedLaneNullUnspawned;
             public int CarDummyTraffic;
 
-            public int CarOwnershipMismatch;
+            public int CarOwnerMismatch;
             public int CarMissingOwner;
             public int CarOwnerMissingBuffer;
             public int CarOwnerMissingBacklink;
-            public int CarStreetOwnershipMismatch;
-            public int CarFacilityOwnershipMismatch;
-            public int CarOcHiddenOwnershipMismatch;
-            public int CarOtherParkedOwnershipMismatch;
+            public int CarStreetOwnerMismatch;
+            public int CarFacilityOwnerMismatch;
+            public int CarOcHiddenOwnerMismatch;
+            public int CarOtherParkedOwnerMismatch;
 
             public int CarOcHiddenCityHouseholdOwner;
             public int CarOcHiddenHouseholdAtOutsideConnection;
@@ -55,7 +56,7 @@ namespace CitizenCleaner
             public int BicycleVisibleParked;
             public int BicycleHiddenAtOutsideConnection;
             public int BicycleHiddenOther;
-            public int BicycleOwnershipMismatch;
+            public int BicycleOwnerMismatch;
 
             public int TrailerTotal;
             public int TrailerHidden;
@@ -67,7 +68,7 @@ namespace CitizenCleaner
             public Entity[]? CarOcHiddenMissingOwnerSamples;
             public Entity[]? CarParkedOtherSamples;
             public Entity[]? CarParkedLaneNullSamples;
-            public Entity[]? CarOwnershipMismatchSamples;
+            public Entity[]? CarOwnerMismatchSamples;
             public Entity[]? TrailerMissingControllerSamples;
 
             public DateTime CapturedAt;

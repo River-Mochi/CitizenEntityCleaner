@@ -22,7 +22,7 @@ namespace CitizenCleaner
     {
         private const int kVehicleSampleLimit = 15;
 
-        private enum CarOwnershipIssue
+        private enum CarOwnerIssue
         {
             None,
             MissingOwner,
@@ -118,7 +118,7 @@ namespace CitizenCleaner
                 collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
             List<Entity>? parkedLaneNullSamples =
                 collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
-            List<Entity>? ownershipMismatchSamples =
+            List<Entity>? ownerMismatchSamples =
                 collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
             List<Entity>? trailerMissingControllerSamples =
                 collectSamples ? new List<Entity>(kVehicleSampleLimit) : null;
@@ -202,21 +202,21 @@ namespace CitizenCleaner
             }
 
             // Match PersonalCarOwnerSystem's owner checks for cars and bicycles.
-            CarOwnershipIssue GetCarOwnershipIssue(
+            CarOwnerIssue GetCarOwnerIssue(
                 Entity vehicle,
                 out Entity owner)
             {
                 owner = Entity.Null;
 
                 if (!ownerLookup.HasComponent(vehicle))
-                    return CarOwnershipIssue.MissingOwner;
+                    return CarOwnerIssue.MissingOwner;
 
                 owner = ownerLookup[vehicle].m_Owner;
                 if (owner == Entity.Null)
-                    return CarOwnershipIssue.MissingOwner;
+                    return CarOwnerIssue.MissingOwner;
 
                 if (!ownedVehicleLookup.HasBuffer(owner))
-                    return CarOwnershipIssue.OwnerMissingBuffer;
+                    return CarOwnerIssue.OwnerMissingBuffer;
 
                 DynamicBuffer<OwnedVehicle> ownedVehicles =
                     ownedVehicleLookup[owner];
@@ -224,10 +224,10 @@ namespace CitizenCleaner
                 for (int i = 0; i < ownedVehicles.Length; i++)
                 {
                     if (ownedVehicles[i].m_Vehicle == vehicle)
-                        return CarOwnershipIssue.None;
+                        return CarOwnerIssue.None;
                 }
 
-                return CarOwnershipIssue.OwnerMissingBacklink;
+                return CarOwnerIssue.OwnerMissingBacklink;
             }
 
             bool HasValidBicycleKeeper(
@@ -265,7 +265,7 @@ namespace CitizenCleaner
                         vehicle,
                         personalCarLookup[vehicle]))
                     {
-                        snapshot.BicycleOwnershipMismatch++;
+                        snapshot.BicycleOwnerMismatch++;
                     }
 
                     if (isParked)
@@ -311,25 +311,25 @@ namespace CitizenCleaner
                 if (isDummyTraffic)
                     snapshot.CarDummyTraffic++;
 
-                CarOwnershipIssue ownershipIssue =
-                    GetCarOwnershipIssue(vehicle, out Entity carOwner);
-                bool hasOwnershipMismatch =
-                    ownershipIssue != CarOwnershipIssue.None;
+                CarOwnerIssue ownerIssue =
+                    GetCarOwnerIssue(vehicle, out Entity carOwner);
+                bool hasOwnerMismatch =
+                    ownerIssue != CarOwnerIssue.None;
 
-                if (hasOwnershipMismatch)
+                if (hasOwnerMismatch)
                 {
-                    snapshot.CarOwnershipMismatch++;
-                    AddSample(ownershipMismatchSamples, vehicle);
+                    snapshot.CarOwnerMismatch++;
+                    AddSample(ownerMismatchSamples, vehicle);
 
-                    switch (ownershipIssue)
+                    switch (ownerIssue)
                     {
-                        case CarOwnershipIssue.MissingOwner:
+                        case CarOwnerIssue.MissingOwner:
                             snapshot.CarMissingOwner++;
                             break;
-                        case CarOwnershipIssue.OwnerMissingBuffer:
+                        case CarOwnerIssue.OwnerMissingBuffer:
                             snapshot.CarOwnerMissingBuffer++;
                             break;
-                        case CarOwnershipIssue.OwnerMissingBacklink:
+                        case CarOwnerIssue.OwnerMissingBacklink:
                             snapshot.CarOwnerMissingBacklink++;
                             break;
                     }
@@ -339,11 +339,18 @@ namespace CitizenCleaner
                 {
                     snapshot.CarParked++;
                     Entity lane = parkedLookup[vehicle].m_Lane;
+
                     if (lane == Entity.Null)
                     {
                         snapshot.CarParkedLaneNull++;
+
+                        if (isHidden)
+                            snapshot.CarParkedLaneNullUnspawned++;
+
                         AddSample(parkedLaneNullSamples, vehicle);
                     }
+
+
 
                     bool laneAtOutsideConnection =
                         IsOutsideConnectionLocation(lane);
@@ -367,8 +374,8 @@ namespace CitizenCleaner
                         if (isDummyTraffic)
                             snapshot.CarOcHiddenDummyTraffic++;
 
-                        if (hasOwnershipMismatch)
-                            snapshot.CarOcHiddenOwnershipMismatch++;
+                        if (hasOwnerMismatch)
+                            snapshot.CarOcHiddenOwnerMismatch++;
 
                         if (laneAtOutsideConnection)
                             snapshot.CarOcHiddenLaneAtOutsideConnection++;
@@ -438,16 +445,16 @@ namespace CitizenCleaner
                         snapshot.CarParkedAtFacility++;
                         if (isHidden)
                             snapshot.CarHiddenAtFacility++;
-                        if (hasOwnershipMismatch)
-                            snapshot.CarFacilityOwnershipMismatch++;
+                        if (hasOwnerMismatch)
+                            snapshot.CarFacilityOwnerMismatch++;
                     }
                     else if (
                         !isHidden &&
                         parkingLaneLookup.HasComponent(lane))
                     {
                         snapshot.CarParkedOnStreet++;
-                        if (hasOwnershipMismatch)
-                            snapshot.CarStreetOwnershipMismatch++;
+                        if (hasOwnerMismatch)
+                            snapshot.CarStreetOwnerMismatch++;
                     }
                     else
                     {
@@ -474,8 +481,8 @@ namespace CitizenCleaner
                             snapshot.CarOtherVisibleNonParkingLane++;
                         }
 
-                        if (hasOwnershipMismatch)
-                            snapshot.CarOtherParkedOwnershipMismatch++;
+                        if (hasOwnerMismatch)
+                            snapshot.CarOtherParkedOwnerMismatch++;
                     }
                 }
                 else if (isActive)
@@ -524,8 +531,8 @@ namespace CitizenCleaner
             snapshot.CarParkedOtherSamples = parkedOtherSamples?.ToArray();
             snapshot.CarParkedLaneNullSamples =
                 parkedLaneNullSamples?.ToArray();
-            snapshot.CarOwnershipMismatchSamples =
-                ownershipMismatchSamples?.ToArray();
+            snapshot.CarOwnerMismatchSamples =
+                ownerMismatchSamples?.ToArray();
             snapshot.TrailerMissingControllerSamples =
                 trailerMissingControllerSamples?.ToArray();
             snapshot.CapturedAt = DateTime.Now;

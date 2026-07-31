@@ -132,34 +132,34 @@ namespace CitizenCleaner
 
 
         [SettingsUIHidden]
-        public string PersonalCarStatusDisplay => string.Empty;
+        public string PersonalCarStatus => string.Empty;
 
         [SettingsUIHidden]
-        public string PersonalCarParkingDisplay => string.Empty;
+        public string PersonalCarParking => string.Empty;
 
         [SettingsUIHidden]
-        public string OutsideConnectionOwnerDisplay => string.Empty;
+        public string OutsideConnectionOwner => string.Empty;
 
         [SettingsUIHidden]
-        public string VehicleOwnershipDisplay => string.Empty;
+        public string VehicleOwner => string.Empty;
 
         [SettingsUIHidden]
-        public string CitizenCountComparisonDisplay => string.Empty;
+        public string CitizenCountCompare => string.Empty;
 
         [SettingsUIHidden]
-        public string OutsideConnectionStageDisplay => string.Empty;
+        public string OutsideConnectStage => string.Empty;
 
         [SettingsUIHidden]
-        public string BicycleStatusDisplay => string.Empty;
+        public string BicycleStatus => string.Empty;
 
         [SettingsUIHidden]
-        public string BicycleParkingDisplay => string.Empty;
+        public string BicycleParking => string.Empty;
 
         [SettingsUIHidden]
-        public string VehicleOwnershipLocationDisplay => string.Empty;
+        public string VehicleOwnerLocation => string.Empty;
 
         [SettingsUIHidden]
-        public string VehicleSnapshotTimeDisplay => string.Empty;
+        public string VehicleSnapshotTime => string.Empty;
 
     }
 }

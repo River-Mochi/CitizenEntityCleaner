@@ -559,6 +559,13 @@ namespace CitizenCleaner
                 $"{vehicles.CarOtherHiddenParkingLane:N0} hidden ParkingLane | " +
                 $"{vehicles.CarOtherHiddenNonParkingLane:N0} hidden other lane | " +
                 $"{vehicles.CarOtherVisibleNonParkingLane:N0} visible other lane");
+
+            report.AppendLine(
+                $"No assigned lane: {vehicles.CarParkedLaneNull:N0} total | " +
+                $"{vehicles.CarParkedLaneNullUnspawned:N0} unspawned | " +
+                $"{(vehicles.CarParkedLaneNull -
+                    vehicles.CarParkedLaneNullUnspawned):N0} spawned");
+
             report.AppendLine();
 
             report.AppendLine("[CARS AT OUTSIDE CONNECTION]");
@@ -588,14 +595,14 @@ namespace CitizenCleaner
 
             report.AppendLine("[POSSIBLE ORPHANS]");
             report.AppendLine(
-                $"{vehicles.CarOwnershipMismatch:N0} total | " +
+                $"{vehicles.CarOwnerMismatch:N0} total | " +
                 $"{vehicles.CarMissingOwner:N0} missing Owner | " +
                 $"{vehicles.CarOwnerMissingBuffer:N0} owner missing buffer | " +
                 $"{vehicles.CarOwnerMissingBacklink:N0} backlink missing");
             report.AppendLine(
-                "The game validates personal-vehicle ownership every 1,024 " +
+                "Game validates personal-vehicle ownership every 1,024 " +
                 "simulation ticks, processing one of 16 update groups each run. " +
-                "Zero or a small temporary count is expected.");
+                "Expect Zero or a small temp count.");
             report.AppendLine();
 
             report.AppendLine("[BICYCLE GROUP]");
@@ -608,7 +615,7 @@ namespace CitizenCleaner
                 $"{vehicles.BicycleVisibleParked:N0} visible parked | " +
                 $"{vehicles.BicycleHiddenAtOutsideConnection:N0} at OC | " +
                 $"{vehicles.BicycleHiddenOther:N0} hidden elsewhere | " +
-                $"{vehicles.BicycleOwnershipMismatch:N0} keeper mismatches");
+                $"{vehicles.BicycleOwnerMismatch:N0} keeper mismatches");
             report.AppendLine();
 
             report.AppendLine("[TRAILERS]");
@@ -646,8 +653,8 @@ namespace CitizenCleaner
                 vehicles.CarParkedLaneNullSamples);
             AppendEntityArray(
                 report,
-                "Ownership mismatch",
-                vehicles.CarOwnershipMismatchSamples);
+                "Owner mismatch",
+                vehicles.CarOwnerMismatchSamples);
             AppendEntityArray(
                 report,
                 "Trailer missing controller",
@@ -669,7 +676,7 @@ namespace CitizenCleaner
                 "it is parked, not active or transitioning.");
             report.AppendLine(
                 "A null lane alone does not mean abandoned. Game can leave it null " +
-                "when no parking space is found; Check ownership to confirm.");
+                "when no parking space is found; Check owner to confirm.");
 
            report.AppendLine(
             "Direct OC owner + DummyTraffic = normal game-created traffic.");
