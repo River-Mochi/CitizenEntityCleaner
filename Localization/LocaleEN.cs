@@ -112,7 +112,8 @@ namespace CitizenCleaner
                     "<OC> = hidden cars at an Outside Connection.\n" +
                     "<Other> = parked cars not matched above; some have no assigned parking lane.\n" +
                     "<No lane> alone does not mean abandoned.\n\n" +
-                    "Use **[LOG REPORT]**, then **[OPEN LOG]**, for details and Entity IDs."
+                    "Use **[LOG REPORT]**, then **[OPEN LOG]**, for more details and Entity IDs.\n" +
+                    "Use Scene Explorer mod to research, and jump to Entity ID numbers."
                 },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHiddenAtOc)), "OC Cars" },
@@ -122,7 +123,8 @@ namespace CitizenCleaner
                     "<At OC> = owner household is currently at an OC.\n" +
                     "<OC owner> = normally game-created DummyTraffic, not a resident car.\n" +
                     "<Away> = commuter, tourist, or moving-away household.\n" +
-                    "<Missing> = no owner or owner is not a household."
+                    "<Missing> = no owner or owner is not a household.\n" +
+                    "Use **[LOG REPORT]**, then **[OPEN LOG]**, for more details and Entity IDs.\n" +
                 },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogStatusReportButton)), "LOG REPORT" },
@@ -207,7 +209,9 @@ namespace CitizenCleaner
                   "1. <Backup your save file first!>\n" +
                   "2. <Review the statistics; press [Refresh Counts] to update them.>\n" +
                   "3. [ ✓ ] <Select the items to include using the checkboxes>\n" +
-                  "4. <Click [Cleanup Citizens] to clean up entities.>" },
+                  "4. <Click [Cleanup Citizens] to clean up entities.>\n" +
+                  "5. Status report is data only."
+                },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.UsageSteps)), "" },
 
                 // Notes block
@@ -222,12 +226,12 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogDiagnosticReportButton)), "Log Entity IDs" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.LogDiagnosticReportButton)),
                   "Logs samples of **25 corrupt**, **10 moving-away, 10 commuter, and 10 homeless citizens**.\n" +
-                  "Also logs suspect vehicle Entity IDs.\n" +
+                  "Also logs vehicle Entity IDs for research.\n" +
                   "Use the **Scene Explorer** mod to inspect an ID."
                 },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.DebugReportNote)),
-                  "Use [Log Entity IDs], [Open Log], then copy an Entity ID into Scene Explorer mod inside the city." },
+                  "Use [Log Entity IDs], [Open Log]. Then copy an Entity ID into Scene Explorer mod when inside the city." },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.OpenLogButton)), "Open Log" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.OpenLogButton)),
