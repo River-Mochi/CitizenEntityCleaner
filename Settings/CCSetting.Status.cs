@@ -129,37 +129,5 @@ namespace CitizenCleaner
         }
 
         private static string FormatCount(int value) => value.ToString("N0");
-
-
-        [SettingsUIHidden]
-        public string PersonalCarStatus => string.Empty;
-
-        [SettingsUIHidden]
-        public string PersonalCarParking => string.Empty;
-
-        [SettingsUIHidden]
-        public string OutsideConnectionOwner => string.Empty;
-
-        [SettingsUIHidden]
-        public string VehicleOwner => string.Empty;
-
-        [SettingsUIHidden]
-        public string CitizenCountCompare => string.Empty;
-
-        [SettingsUIHidden]
-        public string OutsideConnectStage => string.Empty;
-
-        [SettingsUIHidden]
-        public string BicycleStatus => string.Empty;
-
-        [SettingsUIHidden]
-        public string BicycleParking => string.Empty;
-
-        [SettingsUIHidden]
-        public string VehicleOwnerLocation => string.Empty;
-
-        [SettingsUIHidden]
-        public string VehicleSnapshotTime => string.Empty;
-
     }
 }

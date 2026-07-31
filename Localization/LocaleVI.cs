@@ -3,7 +3,6 @@ namespace CitizenCleaner
 {
     using System.Collections.Generic;  // Dictionary
     using Colossal;                    // IDictionarySource
-    using Colossal.IO.AssetDatabase.Internal;
 
     /// <summary>
     /// Vietnamese locale (vi-VN)

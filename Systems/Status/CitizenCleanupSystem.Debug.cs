@@ -1,3 +1,4 @@
+// File CitizenCleanupSystem.Debug.cs
 namespace CitizenCleaner
 {
     using System;
@@ -675,8 +676,9 @@ namespace CitizenCleaner
                 "No assigned lane = ParkedCar with a null lane; " +
                 "it is parked, not active or transitioning.");
             report.AppendLine(
-                "A null lane alone does not mean abandoned. Game can leave it null " +
-                "when no parking space is found; Check owner to confirm.");
+                "A null lane alone does not mean abandoned. " +
+                "Game's FixParkingLocationSystem can leave it null and add Unspawned " +
+                "when no replacement parking space is found.");
 
            report.AppendLine(
             "Direct OC owner + DummyTraffic = normal game-created traffic.");

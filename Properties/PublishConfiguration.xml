@@ -23,10 +23,10 @@ If your save has "corrupt" citizen entities in large numbers, you may find:
 
 - Significant performance drops due to massive numbers of HouseholdFindSystem pathfinding queries.
 - Citizens stuck at leisure or shopping destinations, never leaving.
-- Abandoned Cars permanently occupying parking spots, never being used again are cleaned up as well.
+- Abandoned Cars permanently occupying parking spots, never being used again. These are cleaned up as well.
 - General performance degradation across querying systems
 
-ℹ️ **Select what you need, all optional**
+ℹ️ **Select what you want, all optional**
 - ✅ **corrupt citizens**
 - ✅ **moving-away** (that have no rent)
 - ✅ **commuters**
@@ -51,8 +51,9 @@ If your save has "corrupt" citizen entities in large numbers, you may find:
 5. \[Cleanup Citizens] click button to clean up entities.
 
 **Note**
-this mod does **not** run automatically; it only runs when you click \[Cleanup Citizens].
-Revert to the original saved city if you see unexpected behavior.
+- This mod does **not** run automatically; it only runs when you click \[Cleanup Citizens].
+- Revert to the original saved city if you see unexpected behavior.
+- Could be left installed as there is no real in-city cost. It starts only in the Options menu when a players runs it, then it's back off.
 
 ## What This Mod Does
 
@@ -71,7 +72,7 @@ It's possible using Better Bulldozer on any citizens that are homeless can also 
 It could also be caused by unreachable, manually plopped buildings.
 
 ### Feedback / Bug Report:
-* Github or Discord links on the right (Citizen Entity Cleaner channel).
+* Github or Discord links on the right (Citizen Cleaner channel).
 
 ## Credits
 - phillycheeze - mod author

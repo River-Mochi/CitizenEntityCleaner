@@ -3,7 +3,6 @@ namespace CitizenCleaner
 {
     using System.Collections.Generic;  // Dictionary
     using Colossal;                    // IDictionarySource
-    using Colossal.IO.AssetDatabase.Internal;
 
     /// <summary>
     /// English locale (en-US)
@@ -124,7 +123,7 @@ namespace CitizenCleaner
                     "<OC owner> = normally game-created DummyTraffic, not a resident car.\n" +
                     "<Away> = commuter, tourist, or moving-away household.\n" +
                     "<Missing> = no owner or owner is not a household.\n" +
-                    "Use **[LOG REPORT]**, then **[OPEN LOG]**, for more details and Entity IDs.\n" +
+                    "Use **[LOG REPORT]**, then **[OPEN LOG]**, for more details and Entity IDs."
                 },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.LogStatusReportButton)), "LOG REPORT" },

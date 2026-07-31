@@ -1,4 +1,4 @@
-// CitizenVehicleStatusSystem.cs
+// File: CitizenVehicleStatusSystem.cs
 namespace CitizenCleaner
 {
     using System;
@@ -349,8 +349,6 @@ namespace CitizenCleaner
 
                         AddSample(parkedLaneNullSamples, vehicle);
                     }
-
-
 
                     bool laneAtOutsideConnection =
                         IsOutsideConnectionLocation(lane);

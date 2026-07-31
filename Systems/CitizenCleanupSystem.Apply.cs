@@ -1,11 +1,11 @@
-// CitizenCleanupSystem.Apply.cs
-using Game.Common;          // Deleted
-using Unity.Collections;    // Allocator
-using Unity.Entities;
-using Unity.Mathematics;    // math
-
+// File: CitizenCleanupSystem.Apply.cs
 namespace CitizenCleaner
 {
+    using Game.Common;          // Deleted
+    using Unity.Collections;    // Allocator
+    using Unity.Entities;
+    using Unity.Mathematics;    // math
+
     // PART: Apply (write-side) — starts chunked runs, mark chunks, throttle progress, signal completion
     public partial class CitizenCleanupSystem
     {

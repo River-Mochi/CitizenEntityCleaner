@@ -1,4 +1,4 @@
-// CitizenVehicleStatusSystem.Snapshot.cs
+// File: CitizenVehicleStatusSystem.Snapshot.cs
 namespace CitizenCleaner
 {
     using System;

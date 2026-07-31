@@ -124,7 +124,7 @@ namespace CitizenCleaner
             if (_hasInitialCitySnapshot || _isCleanupInProgress)
                 return;
 
-            // The first Options read in each city builds one on-demand snapshot.
+            // Options read in current city builds one on-demand snapshot.
             _hasInitialCitySnapshot = true;
             RefreshEntityCounts(applyChanges: false);
         }

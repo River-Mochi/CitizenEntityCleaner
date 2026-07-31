@@ -1,4 +1,4 @@
-// CitizenCleanupSystem.Scan.cs
+// File: CitizenCleanupSystem.Scan.cs
 namespace CitizenCleaner
 {
     using System;
