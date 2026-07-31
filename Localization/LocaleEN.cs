@@ -54,11 +54,11 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Homeless" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "Counts and cleans alive citizens marked **ValidCitizen + Homeless**.\n" +
-                  "Dead, tourist, commuter, and citizens missing ValidCitizen are excluded.\n\n" +
-                  "Deleting homeless changes population, workers, students, and residential demand.\n" +
-                  "More homeless households lower general demand but add a positive high-density demand factor.\n\n" +
-                  "<Back up your save first.>" },
+                  "Counts and cleans citizens marked **ValidCitizen + Homeless**.\n" +
+                  "Excluded: Dead, tourist, commuter, and citizens missing ValidCitizen (same vanilla exclusions).\n\n" +
+                  "Deleting homeless changes population, and residential demand.\n" +
+                  "More homeless households lower general demand but add a positive high-density demand factor.\n\n"
+                },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "Cleanup Citizens" },
