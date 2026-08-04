@@ -6,7 +6,6 @@ namespace CitizenCleaner
     using Game;
     using Game.Citizens;
     using Game.Common;
-    using Game.Tools;
     using Unity.Collections;
     using Unity.Entities;
 
@@ -61,7 +60,7 @@ namespace CitizenCleaner
 
             m_householdQuery = SystemAPI.QueryBuilder()
                 .WithAll<Household, HouseholdCitizen>()
-                .WithNone<Deleted, Temp>()
+                .WithNone<Deleted>()
                 .Build();
 
             // The UI enables this system only while a cleanup is running.

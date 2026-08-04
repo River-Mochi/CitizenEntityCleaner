@@ -54,9 +54,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ 노숙자" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "**ValidCitizen + Homeless**로 표시된 생존 시민을 계산하고 정리합니다.\n" +
-                  "사망자, 관광객, 통근자 및 ValidCitizen이 없는 시민은 제외됩니다.\n\n" +
-                  "<주의>: 노숙자 삭제는 알 수 없는 부작용을 일으킬 수 있습니다." },
+                  "**HomelessHousehold** 구성원을 계산하고 정리합니다.\n\n" +
+                  "노숙자를 삭제하면 인구와 주거 수요가 달라집니다.\n" +
+                  "노숙 가구가 많을수록 일반 수요는 낮아지지만 고밀도 수요의 양수 요인은 높아집니다." },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "시민 정리" },
@@ -93,6 +93,13 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "「**정리**」를 클릭할 때 제거될 시민 엔티티 수입니다.\n\n" +
                   "선택한 체크박스 [ ✓ ] 에 따라 달라집니다." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHousing)), "주거" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHousing)),
+                  "현재 가구 수이며 [수치 새로고침]으로 갱신됩니다.\n" +
+                  "<주택 검색 중> = PropertySeeker가 활성화된 가구이며 노숙 가구도 포함합니다.\n" +
+                  "<이주 중/이주 나감> = 게임 1.6 가구 카운터입니다.\n" +
+                  "PropertySeeker는 현재 검색 중이라는 뜻이며 검색 실패가 아닙니다." },
 
                 // Status Cars
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "자동차" },
@@ -136,6 +143,7 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "오류" },
                 { "CitizenCleaner/Status/Progress", "정리 진행 중… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "정리 중… {0}" },
+                { "CitizenCleaner/Status/HousingRowV1", "{0} 주택 검색 중 | {1} 이주 중 | {2} 이주 나감" },
                 { "CitizenCleaner/Status/CarSummaryRowV2", "{0} 활성 | {1} 주차 | {2} 전체 | 업데이트 {3}" },
                 { "CitizenCleaner/Status/CarParkingRowV2", "{0} 도로 | {1} 시설 | {2} OC | {3} 기타" },
                 { "CitizenCleaner/Status/OcHiddenOwnerRowV2", "{0} 도시 | {1} OC에 있음 | {2} OC 소유자 | {3} 외부 | {4} 없음" },
@@ -151,13 +159,20 @@ namespace CitizenCleaner
                   "ValidCitizen은 전입 완료 인구 플래그이며 CC의 손상 시민 판정이 아닙니다.\n" +
                   "게임의 이주 중 및 통근자 값은 가구 수이고 CC는 시민 수를 셉니다." },
 
-                { "CitizenCleaner/Report/HomelessCheckHeading", "[노숙자 대상 조건 확인]" },
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[노숙 인구 교차 확인]" },
+                { "CitizenCleaner/Report/HouseholdHousingHeading", "[가구 주거 상태]" },
+                { "CitizenCleaner/Report/HouseholdHousingNote",
+                  "현재 상태는 겹칠 수 있습니다. PropertySeeker는 검색 중이라는 뜻이며 실패가 아닙니다. CC의 현재 손상 시민 규칙은 이들을 제외하지 않습니다." },
+                { "CitizenCleaner/Report/NoRenterNotMovedInHouseholds",
+                  "PropertyRenter가 없고 MovedIn이 아닌 가구" },
+                { "CitizenCleaner/Report/NoRenterPropertySeekerHouseholds",
+                  "PropertyRenter가 없고 PropertySeeker가 활성화된 가구" },
                 { "CitizenCleaner/Report/GameCountsPending", "게임 수치를 아직 초기화하고 있습니다." },
                 { "CitizenCleaner/Report/CitizenIdsHeading", "[시민 엔티티 ID — Scene Explorer 사용; Index:Version]" },
                 { "CitizenCleaner/Report/CorruptCitizens", "손상된 시민" },
                 { "CitizenCleaner/Report/MovingAwayCitizens", "이주 중인 시민(가구 MovingAway + PropertyRenter 없음)" },
                 { "CitizenCleaner/Report/CommuterCitizens", "통근 시민" },
-                { "CitizenCleaner/Report/HomelessCitizens", "대상 노숙 시민" },
+                { "CitizenCleaner/Report/HomelessCitizens", "정리 대상 노숙 시민" },
                 { "CitizenCleaner/Report/IdsLabel", "ID: " },
                 { "CitizenCleaner/Report/None", "(없음)" },
                 { "CitizenCleaner/Report/VehicleSnapshotUnavailable",

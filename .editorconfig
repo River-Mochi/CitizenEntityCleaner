@@ -1,4 +1,4 @@
-# File: .editorconfig version 0.6.5
+# File: .editorconfig version 0.6.6
 # Purpose:
 #   - Consistent whitespace + LF line endings across normal repo files.
 #   - CRLF for classic Visual Studio .sln files.
@@ -6,6 +6,7 @@
 #   - C# style preferences: explicit types and CO-style naming.
 #   - Support Visual Studio, Rider/ReSharper, Git Bash, PowerShell
 #   - Allow flat namespaces that do NOT have to match folder structure.
+#   - Add Copyright check
 
 root = true
 
@@ -72,6 +73,7 @@ dotnet_separate_import_directive_groups = false
 # Show unused usings, but do not remove them automatically.
 dotnet_diagnostic.IDE0005.severity = suggestion
 dotnet_diagnostic.IDE0073.severity = warning
+file_header_template = <copyright file="{fileName}" company="River-Mochi">\nCopyright (c) 2026 River-Mochi. All rights reserved.\nLicensed under the MIT License. You may not use this file except in compliance with this License.\nSee LICENSE file in the project root for full license information.\nThis notice and the MIT License notice must be kept with\nall copies or substantial portions of this code.\n================= </copyright> ======================
 
 indent_size = 4
 
@@ -136,10 +138,10 @@ dotnet_naming_symbols.private_static_fields.applicable_kinds = field
 dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
 dotnet_naming_symbols.private_static_fields.required_modifiers = static
 
-# All const fields, any accessibility
-dotnet_naming_symbols.const_fields.applicable_kinds = field
-dotnet_naming_symbols.const_fields.applicable_accessibilities = *
-dotnet_naming_symbols.const_fields.required_modifiers = const
+# Public const fields use normal public API PascalCase.
+dotnet_naming_symbols.public_const_fields.applicable_kinds = field
+dotnet_naming_symbols.public_const_fields.applicable_accessibilities = public
+dotnet_naming_symbols.public_const_fields.required_modifiers = const
 
 # Non-public const fields
 # Defensive extra rule so private/internal consts stay kName.
@@ -196,10 +198,10 @@ dotnet_naming_rule.private_static_fields_s_prefix.symbols = private_static_field
 dotnet_naming_rule.private_static_fields_s_prefix.style = s_prefix_pascal
 dotnet_naming_rule.private_static_fields_s_prefix.severity = suggestion
 
-# Const fields: kConstantName
-dotnet_naming_rule.const_fields_k_prefix.symbols = const_fields
-dotnet_naming_rule.const_fields_k_prefix.style = k_prefix_pascal
-dotnet_naming_rule.const_fields_k_prefix.severity = suggestion
+# Public constants: PascalCase
+dotnet_naming_rule.public_const_fields_pascal.symbols = public_const_fields
+dotnet_naming_rule.public_const_fields_pascal.style = pascal
+dotnet_naming_rule.public_const_fields_pascal.severity = suggestion
 
 # Non-public const fields: kConstantName
 dotnet_naming_rule.non_public_const_fields_k_prefix.symbols = non_public_const_fields

@@ -54,9 +54,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ 无家可归者" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "统计并清理带有 **ValidCitizen + Homeless** 标记的存活市民。\n" +
-                  "死亡者、游客、通勤者和缺少 ValidCitizen 的市民会被排除。\n\n" +
-                  "<请谨慎>：删除无家可归者可能导致未知副作用。" },
+                  "统计并清理 **HomelessHousehold** 的成员。\n\n" +
+                  "删除无家可归者会改变人口和住宅需求。\n" +
+                  "无家可归家庭越多，整体需求越低，但高密度住宅的正向需求因素越高。" },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "清理市民" },
@@ -93,6 +93,13 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "当你点击 **[清理]** 时将要移除的市民数量，\n\n" +
                   "基于你在上方勾选的选项 [ ✓ ]。" },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHousing)), "住房" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHousing)),
+                  "当前家庭数量；使用 [刷新计数] 更新。\n" +
+                  "<正在找房> = 已启用 PropertySeeker 的家庭，包括无家可归家庭。\n" +
+                  "<正在迁入/迁出> = 游戏 1.6 的家庭计数器。\n" +
+                  "PropertySeeker 表示正在寻找，并不表示寻找失败。" },
 
                 // Status Cars
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "汽车" },
@@ -136,6 +143,7 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "错误" },
                 { "CitizenCleaner/Status/Progress", "正在清理… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "清理中… {0}" },
+                { "CitizenCleaner/Status/HousingRowV1", "{0} 正在找房 | {1} 正在迁入 | {2} 正在迁出" },
                 { "CitizenCleaner/Status/CarSummaryRowV2", "{0} 活动 | {1} 已停放 | {2} 总计 | 更新 {3}" },
                 { "CitizenCleaner/Status/CarParkingRowV2", "{0} 街道 | {1} 设施 | {2} OC | {3} 其他" },
                 { "CitizenCleaner/Status/OcHiddenOwnerRowV2", "{0} 城市 | {1} 位于 OC | {2} OC 所有者 | {3} 外来 | {4} 缺失" },
@@ -151,13 +159,20 @@ namespace CitizenCleaner
                   "ValidCitizen 是已迁入人口标记，不是 CC 的损坏市民判定。\n" +
                   "游戏的搬离和通勤数值统计家庭；CC 统计市民。" },
 
-                { "CitizenCleaner/Report/HomelessCheckHeading", "[无家可归者资格检查]" },
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[无家可归人口交叉检查]" },
+                { "CitizenCleaner/Report/HouseholdHousingHeading", "[家庭住房状态]" },
+                { "CitizenCleaner/Report/HouseholdHousingNote",
+                  "这些当前状态可能重叠。PropertySeeker 表示正在寻找，不表示失败。CC 当前的异常市民规则不会排除他们。" },
+                { "CitizenCleaner/Report/NoRenterNotMovedInHouseholds",
+                  "没有 PropertyRenter 且未 MovedIn 的家庭" },
+                { "CitizenCleaner/Report/NoRenterPropertySeekerHouseholds",
+                  "没有 PropertyRenter 且已启用 PropertySeeker 的家庭" },
                 { "CitizenCleaner/Report/GameCountsPending", "游戏计数仍在初始化。" },
                 { "CitizenCleaner/Report/CitizenIdsHeading", "[市民实体 ID — 使用 Scene Explorer；索引:版本]" },
                 { "CitizenCleaner/Report/CorruptCitizens", "损坏的市民" },
                 { "CitizenCleaner/Report/MovingAwayCitizens", "正在搬离的市民（家庭 MovingAway + 无 PropertyRenter）" },
                 { "CitizenCleaner/Report/CommuterCitizens", "通勤市民" },
-                { "CitizenCleaner/Report/HomelessCitizens", "符合条件的无家可归市民" },
+                { "CitizenCleaner/Report/HomelessCitizens", "无家可归清理候选市民" },
                 { "CitizenCleaner/Report/IdsLabel", "ID：" },
                 { "CitizenCleaner/Report/None", "（无）" },
                 { "CitizenCleaner/Report/VehicleSnapshotUnavailable",

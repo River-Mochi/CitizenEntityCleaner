@@ -55,9 +55,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Bezdomni" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "Zlicza i usuwa żyjących mieszkańców oznaczonych **ValidCitizen + Homeless**.\n" +
-                  "Zmarli, turyści, dojeżdżający i mieszkańcy bez ValidCitizen są pomijani.\n\n" +
-                  "<UWAGA>: usuwanie bezdomnych może powodować nieznane skutki uboczne." },
+                  "Zlicza i usuwa członków **HomelessHousehold**.\n\n" +
+                  "Usuwanie bezdomnych zmienia populację i popyt mieszkaniowy.\n" +
+                  "Więcej bezdomnych gospodarstw obniża popyt ogólny, ale zwiększa dodatni czynnik popytu na wysoką gęstość." },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "Wyczyść mieszkańców" },
@@ -94,6 +94,13 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "Liczba encji mieszkańców, które zostaną usunięte po kliknięciu **[Wyczyść]**,\n\n" +
                   "zgodnie z zaznaczonymi polami [ ✓ ]." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHousing)), "Mieszkania" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHousing)),
+                  "Bieżące liczby gospodarstw; odświeżane przez [Odśwież liczniki].\n" +
+                  "<Szukające> = gospodarstwa z włączonym PropertySeeker, także bezdomne.\n" +
+                  "<Wprowadzające/wyprowadzające> = liczniki gospodarstw z gry 1.6.\n" +
+                  "PropertySeeker oznacza trwające wyszukiwanie, a nie niepowodzenie." },
 
                 // Status Cars
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "Samochody" },
@@ -138,6 +145,7 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error", "Błąd" },
                 { "CitizenCleaner/Status/Progress", "Czyszczenie w toku… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "Czyszczenie… {0}" },
+                { "CitizenCleaner/Status/HousingRowV1", "{0} szuka | {1} wprowadza się | {2} wyprowadza się" },
                 { "CitizenCleaner/Status/CarSummaryRowV2", "{0} aktywne | {1} zaparkowane | {2} razem | aktualizacja {3}" },
                 { "CitizenCleaner/Status/CarParkingRowV2", "{0} ulica | {1} obiekt | {2} OC | {3} inne" },
                 { "CitizenCleaner/Status/OcHiddenOwnerRowV2",
@@ -154,14 +162,21 @@ namespace CitizenCleaner
                   "ValidCitizen to flaga ludności wprowadzonej do miasta, a nie test uszkodzonych mieszkańców CC.\n" +
                   "Gra liczy wyprowadzające się i dojeżdżające gospodarstwa; CC liczy mieszkańców." },
 
-                { "CitizenCleaner/Report/HomelessCheckHeading", "[SPRAWDZENIE KWALIFIKACJI BEZDOMNYCH]" },
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[PORÓWNANIE POPULACJI BEZDOMNYCH]" },
+                { "CitizenCleaner/Report/HouseholdHousingHeading", "[STANY MIESZKANIOWE GOSPODARSTW]" },
+                { "CitizenCleaner/Report/HouseholdHousingNote",
+                  "Te stany mogą się nakładać. PropertySeeker oznacza wyszukiwanie, nie niepowodzenie. Obecna reguła CC dla uszkodzonych mieszkańców ich nie wyklucza." },
+                { "CitizenCleaner/Report/NoRenterNotMovedInHouseholds",
+                  "Gospodarstwa bez PropertyRenter i bez MovedIn" },
+                { "CitizenCleaner/Report/NoRenterPropertySeekerHouseholds",
+                  "Gospodarstwa bez PropertyRenter z włączonym PropertySeeker" },
                 { "CitizenCleaner/Report/GameCountsPending", "Liczniki gry są nadal inicjalizowane." },
                 { "CitizenCleaner/Report/CitizenIdsHeading", "[ID ENCJI MIESZKAŃCÓW — użyj Scene Explorer; Indeks:Wersja]" },
                 { "CitizenCleaner/Report/CorruptCitizens", "Uszkodzeni mieszkańcy" },
                 { "CitizenCleaner/Report/MovingAwayCitizens",
                   "Wyprowadzający się mieszkańcy (gospodarstwo MovingAway + brak PropertyRenter)" },
                 { "CitizenCleaner/Report/CommuterCitizens", "Dojeżdżający mieszkańcy" },
-                { "CitizenCleaner/Report/HomelessCitizens", "Kwalifikujący się bezdomni mieszkańcy" },
+                { "CitizenCleaner/Report/HomelessCitizens", "Bezdomni kandydaci do usunięcia" },
                 { "CitizenCleaner/Report/IdsLabel", "ID: " },
                 { "CitizenCleaner/Report/None", "(brak)" },
                 { "CitizenCleaner/Report/VehicleSnapshotUnavailable",

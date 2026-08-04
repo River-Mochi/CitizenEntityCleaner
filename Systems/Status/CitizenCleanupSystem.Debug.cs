@@ -46,12 +46,32 @@ namespace CitizenCleaner
             }
         }
 
+        public readonly struct HousingStatusSnapshot
+        {
+            public readonly int PropertySeekerHouseholds;
+            public readonly int MovingInHouseholds;
+            public readonly int MovingAwayHouseholds;
+            public readonly bool GameCountsReady;
+
+            public HousingStatusSnapshot(
+                int propertySeekerHouseholds,
+                int movingInHouseholds,
+                int movingAwayHouseholds,
+                bool gameCountsReady)
+            {
+                PropertySeekerHouseholds = propertySeekerHouseholds;
+                MovingInHouseholds = movingInHouseholds;
+                MovingAwayHouseholds = movingAwayHouseholds;
+                GameCountsReady = gameCountsReady;
+            }
+        }
+
         private struct DiagnosticCitizenCounts
         {
             public int Corrupt;
             public int MovingAway;
             public int Commuters;
-            public int Homeless;
+            public int HomelessValid;
             public int HomelessHouseholdMembers;
             public int HomelessMissingCitizen;
             public int HomelessTourist;
@@ -62,10 +82,13 @@ namespace CitizenCleaner
             public int HomelessMissingValidMovedInMismatch;
             public int HomelessDead;
             public int HomelessMissingFlag;
+            public int PropertySeekerHouseholds;
             public int NormalPropertySeekerHouseholds;
             public int HomelessPropertySeekerHouseholds;
             public int NoPropertyRenterNotMovedInHouseholds;
             public int NoPropertyRenterPropertySeekerHouseholds;
+            public int CorruptNotMovedInCitizens;
+            public int CorruptPropertySeekerCitizens;
         }
 
         // Game 1.6 mixes citizen + household totals, so keep each explicit.
@@ -95,6 +118,32 @@ namespace CitizenCleaner
                 data.m_MovingAwayHouseholdCount,
                 data.m_CommuterHouseholdCount,
                 data.m_TouristCitizenCount,
+                !gameCounts.IsCountDataNotReady());
+        }
+
+        public HousingStatusSnapshot GetHousingStatusSnapshot()
+        {
+            int propertySeekers = CountPropertySeekerHouseholds();
+
+            CountHouseholdDataSystem? gameCounts =
+                World.GetExistingSystemManaged<CountHouseholdDataSystem>();
+
+            if (gameCounts == null)
+            {
+                return new HousingStatusSnapshot(
+                    propertySeekers,
+                    0,
+                    0,
+                    gameCountsReady: false);
+            }
+
+            CountHouseholdDataSystem.HouseholdData data =
+                gameCounts.GetHouseholdCountData();
+
+            return new HousingStatusSnapshot(
+                propertySeekers,
+                data.m_MovingInHouseholdCount,
+                data.m_MovingAwayHouseholdCount,
                 !gameCounts.IsCountDataNotReady());
         }
 
@@ -213,8 +262,8 @@ namespace CitizenCleaner
                 commuters);
             AppendEntitySection(
                 report,
-                ReportText("HomelessCitizens", "Eligible homeless citizens"),
-                diagnosticCounts.Homeless,
+                ReportText("HomelessCitizens", "Homeless cleanup candidates"),
+                diagnosticCounts.HomelessHouseholdMembers,
                 homeless);
 
             if (vehicleSnapshot.HasValue)

@@ -54,9 +54,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ ホームレス" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "**ValidCitizen + Homeless** が付いた生存中の市民を数えて整理します。\n" +
-                  "死亡者、観光客、通勤者、ValidCitizen のない市民は除外されます。\n\n" +
-                  "<注意>: ホームレスの削除は不明な副作用を起こす可能性があります。" },
+                  "**HomelessHousehold** のメンバーを数えて整理します。\n\n" +
+                  "ホームレスを削除すると、人口と住宅需要が変化します。\n" +
+                  "ホームレス世帯が増えると全体需要は下がりますが、高密度住宅へのプラス要因は増えます。" },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "市民をクリーンアップ" },
@@ -93,6 +93,13 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "「**クリーンアップ**」をクリックした際に削除される市民エンティティ数。\n\n" +
                   "選択したチェックボックス [ ✓ ] に基づきます。" },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHousing)), "住宅" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHousing)),
+                  "現在の世帯数です。[カウント更新] で更新されます。\n" +
+                  "<住宅検索中> = PropertySeeker が有効な世帯。ホームレス世帯も含みます。\n" +
+                  "<転入中/転出中> = ゲーム 1.6 の世帯カウンターです。\n" +
+                  "PropertySeeker は現在検索中という意味で、検索失敗ではありません。" },
 
                 // Status Cars
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "自動車" },
@@ -136,6 +143,7 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "エラー" },
                 { "CitizenCleaner/Status/Progress", "クリーンアップ進行中… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "クリーン中… {0}" },
+                { "CitizenCleaner/Status/HousingRowV1", "{0} 住宅検索中 | {1} 転入中 | {2} 転出中" },
                 { "CitizenCleaner/Status/CarSummaryRowV2", "{0} 走行中 | {1} 駐車中 | {2} 合計 | 更新 {3}" },
                 { "CitizenCleaner/Status/CarParkingRowV2", "{0} 路上 | {1} 施設 | {2} OC | {3} その他" },
                 { "CitizenCleaner/Status/OcHiddenOwnerRowV2", "{0} 都市 | {1} OC に所在 | {2} OC 所有者 | {3} 市外 | {4} 不明" },
@@ -151,13 +159,20 @@ namespace CitizenCleaner
                   "ValidCitizen は転入済み人口のフラグであり、CC の破損市民判定ではありません。\n" +
                   "ゲームの転出中と通勤者の値は世帯数、CC は市民数です。" },
 
-                { "CitizenCleaner/Report/HomelessCheckHeading", "[ホームレス対象条件の確認]" },
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[ホームレス人口の照合]" },
+                { "CitizenCleaner/Report/HouseholdHousingHeading", "[世帯の住居状態]" },
+                { "CitizenCleaner/Report/HouseholdHousingNote",
+                  "現在の状態は重複する場合があります。PropertySeeker は検索中を意味し、失敗ではありません。CC の現行の破損市民ルールでは除外されません。" },
+                { "CitizenCleaner/Report/NoRenterNotMovedInHouseholds",
+                  "PropertyRenter なし、かつ MovedIn でない世帯" },
+                { "CitizenCleaner/Report/NoRenterPropertySeekerHouseholds",
+                  "PropertyRenter なし、かつ PropertySeeker が有効な世帯" },
                 { "CitizenCleaner/Report/GameCountsPending", "ゲームのカウントを初期化中です。" },
                 { "CitizenCleaner/Report/CitizenIdsHeading", "[市民エンティティ ID — Scene Explorer を使用; Index:Version]" },
                 { "CitizenCleaner/Report/CorruptCitizens", "破損した市民" },
                 { "CitizenCleaner/Report/MovingAwayCitizens", "転出中の市民（世帯に MovingAway + PropertyRenter なし）" },
                 { "CitizenCleaner/Report/CommuterCitizens", "通勤者" },
-                { "CitizenCleaner/Report/HomelessCitizens", "対象となるホームレス市民" },
+                { "CitizenCleaner/Report/HomelessCitizens", "整理対象のホームレス市民" },
                 { "CitizenCleaner/Report/IdsLabel", "ID: " },
                 { "CitizenCleaner/Report/None", "（なし）" },
                 { "CitizenCleaner/Report/VehicleSnapshotUnavailable",

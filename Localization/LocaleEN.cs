@@ -54,11 +54,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Homeless" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "Counts and cleans citizens marked **ValidCitizen + Homeless**.\n" +
-                  "Excluded: Dead, tourist, commuter, and citizens missing ValidCitizen (same vanilla exclusions).\n\n" +
-                  "Deleting homeless changes population, and residential demand.\n" +
-                  "More homeless households lower general demand but add a positive high-density demand factor.\n\n"
-                },
+                  "Counts and cleans members of **HomelessHousehold**.\n\n" +
+                  "Deleting homeless changes population and residential demand.\n" +
+                  "More homeless households lower general demand but add a positive high-density demand factor." },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "Cleanup Citizens" },
@@ -94,6 +92,13 @@ namespace CitizenCleaner
                   "Citizens to Clean: select [ ✓ ] above" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "Citizen entities that [Cleanup Citizens] will remove, based on the selected boxes [ ✓ ]." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHousing)), "Housing" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHousing)),
+                  "Current household counts; updates with [Refresh Counts].\n" +
+                  "<Seeking> = households with enabled PropertySeeker, including homeless households.\n" +
+                  "<Moving in/out> = Game 1.6 household counters.\n" +
+                  "PropertySeeker means searching now, not a failed search." },
 
                 // Status Cars
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "Cars" },
@@ -143,6 +148,8 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "Error" },
                 { "CitizenCleaner/Status/Progress", "Cleanup in progress… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "Cleaning… {0}" },
+                { "CitizenCleaner/Status/HousingRowV1",
+                  "{0} seeking | {1} moving in | {2} moving out" },
                 { "CitizenCleaner/Status/CarSummaryRowV2",
                   "{0} active | {1} parked | {2} total | updated {3}" },
                 { "CitizenCleaner/Status/CarParkingRowV2",
@@ -162,7 +169,7 @@ namespace CitizenCleaner
                   "Game moving-away and commuter counts are households; CC counts citizens." },
 
                 { "CitizenCleaner/Report/HomelessCheckHeading",
-                  "[HOMELESS ELIGIBILITY CHECK]" },
+                  "[HOMELESS POPULATION CROSS-CHECK]" },
                 { "CitizenCleaner/Report/HouseholdHousingHeading",
                   "[HOUSEHOLD HOUSING STATES]" },
                 { "CitizenCleaner/Report/HouseholdHousingNote",
@@ -182,7 +189,7 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Report/CommuterCitizens",
                   "Commuter citizens" },
                 { "CitizenCleaner/Report/HomelessCitizens",
-                  "Eligible homeless citizens" },
+                  "Homeless cleanup candidates" },
                 { "CitizenCleaner/Report/IdsLabel", "IDs: " },
                 { "CitizenCleaner/Report/None", "(none)" },
                 { "CitizenCleaner/Report/VehicleSnapshotUnavailable",

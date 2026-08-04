@@ -27,7 +27,7 @@ namespace CitizenCleaner
                 "valid moved-in citizens");
             report.AppendLine();
             report.AppendLine(
-                $"Homeless: CC {cc.Homeless:N0} citizens | " +
+                $"Homeless: CC {cc.HomelessHouseholdMembers:N0} cleanup candidates | " +
                 $"game {game.GameHomelessCitizens:N0} valid citizens");
             report.AppendLine(
                 $"Moving-away: CC {cc.MovingAway:N0} citizens | " +
@@ -62,18 +62,18 @@ namespace CitizenCleaner
             DiagnosticCitizenCounts counts,
             List<string> mismatchDetails)
         {
-            int excluded =
-                counts.HomelessHouseholdMembers - counts.Homeless;
+            int outsideGameCount =
+                counts.HomelessHouseholdMembers - counts.HomelessValid;
 
             report.AppendLine(ReportText(
                 "HomelessCheckHeading",
-                "[HOMELESS ELIGIBILITY CHECK]"));
+                "[HOMELESS POPULATION CROSS-CHECK]"));
             report.AppendLine(
-                $"{counts.HomelessHouseholdMembers:N0} members of " +
-                $"HomelessHousehold | {counts.Homeless:N0} eligible | " +
-                $"{excluded:N0} excluded");
+                $"{counts.HomelessHouseholdMembers:N0} cleanup candidates | " +
+                $"{counts.HomelessValid:N0} game-valid | " +
+                $"{outsideGameCount:N0} outside the game-valid count");
             report.AppendLine(
-                $"Excluded: {counts.HomelessDead:N0} dead | " +
+                $"Outside game-valid count: {counts.HomelessDead:N0} dead | " +
                 $"{counts.HomelessMissingValidCitizen:N0} missing ValidCitizen | " +
                 $"{counts.HomelessCommuter:N0} commuter | " +
                 $"{counts.HomelessTourist:N0} tourist | " +
@@ -89,7 +89,10 @@ namespace CitizenCleaner
             report.AppendLine(
                 "Moving-away is expected. Recheck not moved-in IDs after running the city; " +
                 "inspect moved-in mismatches in Scene Explorer.");
-            report.AppendLine("Excluded samples:");
+            report.AppendLine(
+                "CC keeps its existing broad HomelessHousehold cleanup rule; " +
+                "these exclusions are diagnostic only.");
+            report.AppendLine("Game-count exclusion samples:");
 
             if (mismatchDetails.Count == 0)
             {
@@ -119,6 +122,7 @@ namespace CitizenCleaner
                 $"moving away: {game.GameMovingAwayHouseholds:N0} households");
             report.AppendLine(
                 $"PropertySeeker enabled: " +
+                $"{counts.PropertySeekerHouseholds:N0} total | " +
                 $"{counts.NormalPropertySeekerHouseholds:N0} normal | " +
                 $"{counts.HomelessPropertySeekerHouseholds:N0} homeless households");
             report.AppendLine(
@@ -127,6 +131,10 @@ namespace CitizenCleaner
             report.AppendLine(
                 $"No PropertyRenter + PropertySeeker enabled: " +
                 $"{counts.NoPropertyRenterPropertySeekerHouseholds:N0} households");
+            report.AppendLine(
+                $"Current corrupt candidates: {counts.Corrupt:N0} total | " +
+                $"{counts.CorruptNotMovedInCitizens:N0} not MovedIn | " +
+                $"{counts.CorruptPropertySeekerCitizens:N0} PropertySeeker enabled");
             report.AppendLine(ReportText(
                 "HouseholdHousingNote",
                 "These current states can overlap. PropertySeeker means searching, " +
@@ -186,9 +194,13 @@ namespace CitizenCleaner
                     !isCommuter &&
                     !isTourist &&
                     !isMovingAway;
+                bool isCurrentCorruptHousehold =
+                    isNormalHousingHousehold && !hasPropertyRenter;
 
                 if (isSeekingProperty)
                 {
+                    counts.PropertySeekerHouseholds++;
+
                     if (isHomeless)
                         counts.HomelessPropertySeekerHouseholds++;
                     else if (isNormalHousingHousehold)
@@ -217,11 +229,6 @@ namespace CitizenCleaner
                         kReportSampleLimit);
                 }
 
-                CleanupType type = ClassifyHousehold(household);
-
-                if (type == CleanupType.None)
-                    continue;
-
                 DynamicBuffer<HouseholdCitizen> members =
                     EntityManager.GetBuffer<HouseholdCitizen>(household);
 
@@ -231,19 +238,52 @@ namespace CitizenCleaner
                     if (!IsEligibleCitizen(citizen))
                         continue;
 
-                    if (type == CleanupType.Homeless)
+                    if (isCurrentCorruptHousehold)
+                    {
+                        counts.Corrupt++;
+                        AddSample(
+                            corrupt,
+                            citizen,
+                            kCorruptSampleLimit);
+
+                        if (!hasMovedIn)
+                            counts.CorruptNotMovedInCitizens++;
+
+                        if (isSeekingProperty)
+                            counts.CorruptPropertySeekerCitizens++;
+                    }
+
+                    if (isMovingAway && !hasPropertyRenter)
+                    {
+                        counts.MovingAway++;
+                        AddSample(
+                            movingAway,
+                            citizen,
+                            kReportSampleLimit);
+                    }
+
+                    if (isCommuter)
+                    {
+                        counts.Commuters++;
+                        AddSample(
+                            commuters,
+                            citizen,
+                            kReportSampleLimit);
+                    }
+
+                    if (isHomeless)
                     {
                         counts.HomelessHouseholdMembers++;
+                        AddSample(
+                            homeless,
+                            citizen,
+                            kReportSampleLimit);
                         HomelessExclusionReason reason =
                             GetHomelessExclusionReason(citizen);
 
                         if (reason == HomelessExclusionReason.None)
                         {
-                            counts.Homeless++;
-                            AddSample(
-                                homeless,
-                                citizen,
-                                kReportSampleLimit);
+                            counts.HomelessValid++;
                         }
                         else
                         {
@@ -267,32 +307,6 @@ namespace CitizenCleaner
                             }
                         }
 
-                        continue;
-                    }
-
-                    switch (type)
-                    {
-                        case CleanupType.Corrupt:
-                            counts.Corrupt++;
-                            AddSample(
-                                corrupt,
-                                citizen,
-                                kCorruptSampleLimit);
-                            break;
-                        case CleanupType.MovingAway:
-                            counts.MovingAway++;
-                            AddSample(
-                                movingAway,
-                                citizen,
-                                kReportSampleLimit);
-                            break;
-                        case CleanupType.Commuters:
-                            counts.Commuters++;
-                            AddSample(
-                                commuters,
-                                citizen,
-                                kReportSampleLimit);
-                            break;
                     }
                 }
             }
@@ -305,6 +319,25 @@ namespace CitizenCleaner
             return
                 EntityManager.HasComponent<PropertySeeker>(household) &&
                 EntityManager.IsComponentEnabled<PropertySeeker>(household);
+        }
+
+        private int CountPropertySeekerHouseholds()
+        {
+            int total = 0;
+
+            using NativeArray<Entity> households =
+                m_householdQuery.ToEntityArray(Allocator.TempJob);
+
+            for (int i = 0; i < households.Length; i++)
+            {
+                Entity household = households[i];
+                if (!IsPropertySeekerEnabled(household))
+                    continue;
+
+                total++;
+            }
+
+            return total;
         }
 
         private static void CountHomelessExclusion(

@@ -6,7 +6,6 @@ namespace CitizenCleaner
     using Game.Buildings;
     using Game.Citizens;
     using Game.Common;
-    using Game.Tools;
     using Unity.Collections;
     using Unity.Entities;
     using Unity.Mathematics;
@@ -36,18 +35,14 @@ namespace CitizenCleaner
                 for (int i = 0; i < households.Length; i++)
                 {
                     Entity household = households[i];
-                    CleanupType type = ClassifyHousehold(household);
+                    CleanupType type = ClassifyHousehold(
+                        household,
+                        wantCorrupt,
+                        wantHomeless,
+                        wantCommuters,
+                        wantMovingAway);
 
-                    bool selected = type switch
-                    {
-                        CleanupType.Corrupt => wantCorrupt,
-                        CleanupType.Homeless => wantHomeless,
-                        CleanupType.Commuters => wantCommuters,
-                        CleanupType.MovingAway => wantMovingAway,
-                        _ => false,
-                    };
-
-                    if (!selected)
+                    if (type == CleanupType.None)
                         continue;
 
                     DynamicBuffer<HouseholdCitizen> members =
@@ -56,7 +51,7 @@ namespace CitizenCleaner
                     for (int j = 0; j < members.Length; j++)
                     {
                         Entity citizen = members[j].m_Citizen;
-                        if (!IsEligibleCitizen(citizen, type))
+                        if (!IsEligibleCitizen(citizen))
                             continue;
 
                         candidates.Add(citizen);
@@ -88,7 +83,12 @@ namespace CitizenCleaner
             return candidates.Length;
         }
 
-        private CleanupType ClassifyHousehold(Entity household)
+        private CleanupType ClassifyHousehold(
+            Entity household,
+            bool wantCorrupt,
+            bool wantHomeless,
+            bool wantCommuters,
+            bool wantMovingAway)
         {
             bool hasPropertyRenter =
                 EntityManager.HasComponent<PropertyRenter>(household);
@@ -101,18 +101,25 @@ namespace CitizenCleaner
             bool isMovingAway =
                 EntityManager.HasComponent<MovingAway>(household);
 
-            if (isHomeless)
+            if (wantHomeless && isHomeless)
                 return CleanupType.Homeless;
 
-            if (isCommuter)
+            if (wantCommuters && isCommuter)
                 return CleanupType.Commuters;
 
-            // MovingAway belongs to the household, before every member gets its trip.
-            if (isMovingAway && !hasPropertyRenter)
-                return CleanupType.MovingAway;
-
-            if (!hasPropertyRenter && !isTourist && !isMovingAway)
+            if (wantCorrupt &&
+                !hasPropertyRenter &&
+                !isHomeless &&
+                !isCommuter &&
+                !isTourist &&
+                !isMovingAway)
+            {
                 return CleanupType.Corrupt;
+            }
+
+            // MovingAway is a household state, before every member gets its trip.
+            if (wantMovingAway && isMovingAway && !hasPropertyRenter)
+                return CleanupType.MovingAway;
 
             return CleanupType.None;
         }
@@ -132,19 +139,7 @@ namespace CitizenCleaner
         {
             return
                 EntityManager.Exists(citizen) &&
-                !EntityManager.HasComponent<Deleted>(citizen) &&
-                !EntityManager.HasComponent<Temp>(citizen);
-        }
-
-        private bool IsEligibleCitizen(Entity citizen, CleanupType type)
-        {
-            if (!IsEligibleCitizen(citizen))
-                return false;
-
-            return
-                type != CleanupType.Homeless ||
-                GetHomelessExclusionReason(citizen) ==
-                    HomelessExclusionReason.None;
+                !EntityManager.HasComponent<Deleted>(citizen);
         }
 
         private HomelessExclusionReason GetHomelessExclusionReason(

@@ -5,7 +5,7 @@ namespace CitizenCleaner
     using Game.Settings;
 
     /// <summary>
-    /// Compact personal-car status for the Options menu.
+    /// Compact housing and personal-car status for the Options menu.
     /// Full details are written to the diagnostic report.
     /// </summary>
     public partial class CCSetting
@@ -14,6 +14,8 @@ namespace CitizenCleaner
 
         private const string CarSummaryRowKey =
             "CitizenCleaner/Status/CarSummaryRowV2";
+        private const string HousingRowKey =
+            "CitizenCleaner/Status/HousingRowV1";
         private const string CarParkingRowKey =
             "CitizenCleaner/Status/CarParkingRowV2";
         private const string OcHiddenOwnerRowKey =
@@ -21,14 +23,27 @@ namespace CitizenCleaner
 
         private const string CarSummaryRowFallback =
             "{0} active | {1} parked | {2} total | updated {3}";
+        private const string HousingRowFallback =
+            "{0} seeking | {1} moving in | {2} moving out";
         private const string CarParkingRowFallback =
             "{0} street | {1} facility | {2} OC | {3} other";
         private const string OcHiddenOwnerRowFallback =
             "{0} city | {1} at OC | {2} OC owner | {3} away | {4} missing";
 
+        private string m_Housing = DefaultCountPrompt;
         private string m_CarSummary = DefaultCountPrompt;
         private string m_ParkedCars = DefaultCountPrompt;
         private string m_CarsAtOutsideConnection = DefaultCountPrompt;
+
+        [SettingsUISection(kSection, StatusGroup)]
+        public string StatusHousing
+        {
+            get
+            {
+                EnsureInitialCitySnapshot();
+                return m_Housing;
+            }
+        }
 
         [SettingsUISection(kSection, StatusGroup)]
         public string StatusCars
@@ -91,6 +106,7 @@ namespace CitizenCleaner
                 error ? L(ErrorKey, "Error") :
                 L(RefreshPromptKey, DefaultCountPrompt);
 
+            m_Housing = message;
             m_CarSummary = message;
             m_ParkedCars = message;
             m_CarsAtOutsideConnection = message;
@@ -98,9 +114,25 @@ namespace CitizenCleaner
 
         private void RefreshVehicleStatus()
         {
+            CitizenCleanupSystem cleanupSystem = Mod.CleanupSystem
+                ?? throw new InvalidOperationException(
+                    "CitizenCleanupSystem is not initialized.");
             CitizenVehicleStatusSystem vehicleSystem = Mod.VehicleStatusSystem
                 ?? throw new InvalidOperationException(
                     "CitizenVehicleStatusSystem is not initialized.");
+
+            CitizenCleanupSystem.HousingStatusSnapshot housing =
+                cleanupSystem.GetHousingStatusSnapshot();
+
+            m_Housing = housing.GameCountsReady
+                ? string.Format(
+                    L(HousingRowKey, HousingRowFallback),
+                    FormatCount(housing.PropertySeekerHouseholds),
+                    FormatCount(housing.MovingInHouseholds),
+                    FormatCount(housing.MovingAwayHouseholds))
+                : L(
+                    "CitizenCleaner/Report/GameCountsPending",
+                    "Game counts are still initializing.");
 
             CitizenVehicleStatusSystem.Snapshot vehicles =
                 vehicleSystem.BuildSnapshot();

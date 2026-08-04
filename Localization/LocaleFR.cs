@@ -54,9 +54,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Sans-abri" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "Compte et nettoie les citoyens vivants marqués **ValidCitizen + Homeless**.\n" +
-                  "Les morts, touristes, navetteurs et citoyens sans ValidCitizen sont exclus.\n\n" +
-                  "<ATTENTION> : supprimer les sans-abri peut entraîner des effets inconnus." },
+                  "Compte et nettoie les membres de **HomelessHousehold**.\n\n" +
+                  "Supprimer les sans-abri modifie la population et la demande résidentielle.\n" +
+                  "Davantage de ménages sans-abri réduit la demande générale, mais augmente le facteur positif de haute densité." },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "Nettoyer les citoyens" },
@@ -93,6 +93,13 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "Nombre d’entités citoyens supprimées lorsque vous cliquez sur **[Nettoyer les citoyens]**,\n\n" +
                   "selon les cases [ ✓ ] sélectionnées." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHousing)), "Logement" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHousing)),
+                  "Nombre actuel de ménages ; actualisé avec [Actualiser].\n" +
+                  "<En recherche> = ménages avec PropertySeeker activé, y compris les ménages sans-abri.\n" +
+                  "<Arrivées/départs> = compteurs de ménages du jeu 1.6.\n" +
+                  "PropertySeeker indique une recherche en cours, pas un échec." },
 
                 // Status Cars
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "Voitures" },
@@ -136,6 +143,7 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "Erreur" },
                 { "CitizenCleaner/Status/Progress", "Nettoyage en cours… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "Nettoyage… {0}" },
+                { "CitizenCleaner/Status/HousingRowV1", "{0} en recherche | {1} arrivées | {2} départs" },
                 { "CitizenCleaner/Status/CarSummaryRowV2", "{0} actives | {1} stationnées | {2} total | actualisé {3}" },
                 { "CitizenCleaner/Status/CarParkingRowV2", "{0} rue | {1} site | {2} OC | {3} autres" },
                 { "CitizenCleaner/Status/OcHiddenOwnerRowV2",
@@ -152,7 +160,14 @@ namespace CitizenCleaner
                   "ValidCitizen est un indicateur de population installée, pas le test des citoyens corrompus de CC.\n" +
                   "Le jeu compte les foyers en déménagement et navetteurs ; CC compte les citoyens." },
 
-                { "CitizenCleaner/Report/HomelessCheckHeading", "[VÉRIFICATION DE L'ÉLIGIBILITÉ DES SANS-ABRI]" },
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[VÉRIFICATION DE LA POPULATION SANS-ABRI]" },
+                { "CitizenCleaner/Report/HouseholdHousingHeading", "[ÉTATS DE LOGEMENT DES FOYERS]" },
+                { "CitizenCleaner/Report/HouseholdHousingNote",
+                  "Ces états peuvent se chevaucher. PropertySeeker signifie recherche, pas échec. La règle actuelle de CC pour les citoyens corrompus ne les exclut pas." },
+                { "CitizenCleaner/Report/NoRenterNotMovedInHouseholds",
+                  "Foyers sans PropertyRenter et non MovedIn" },
+                { "CitizenCleaner/Report/NoRenterPropertySeekerHouseholds",
+                  "Foyers sans PropertyRenter avec PropertySeeker activé" },
                 { "CitizenCleaner/Report/GameCountsPending", "Les compteurs du jeu sont encore en cours d'initialisation." },
                 { "CitizenCleaner/Report/CitizenIdsHeading",
                   "[ID D'ENTITÉS DE CITOYENS — utilisez Scene Explorer ; Index:Version]" },
@@ -160,7 +175,7 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Report/MovingAwayCitizens",
                   "Citoyens en déménagement (foyer MovingAway + sans PropertyRenter)" },
                 { "CitizenCleaner/Report/CommuterCitizens", "Citoyens navetteurs" },
-                { "CitizenCleaner/Report/HomelessCitizens", "Citoyens sans-abri admissibles" },
+                { "CitizenCleaner/Report/HomelessCitizens", "Candidats sans-abri au nettoyage" },
                 { "CitizenCleaner/Report/IdsLabel", "ID : " },
                 { "CitizenCleaner/Report/None", "(aucun)" },
                 { "CitizenCleaner/Report/VehicleSnapshotUnavailable",

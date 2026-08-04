@@ -54,9 +54,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Vô gia cư" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "Đếm và dọn các công dân còn sống có cờ **ValidCitizen + Homeless**.\n" +
-                  "Loại trừ người đã chết, khách du lịch, người đi làm và công dân thiếu ValidCitizen.\n\n" +
-                  "<CẨN THẬN>: xóa người vô gia cư có thể gây ra tác dụng phụ chưa biết." },
+                  "Đếm và dọn thành viên của **HomelessHousehold**.\n\n" +
+                  "Xóa người vô gia cư làm thay đổi dân số và nhu cầu nhà ở.\n" +
+                  "Nhiều hộ vô gia cư hơn làm giảm nhu cầu chung nhưng tăng yếu tố tích cực cho mật độ cao." },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "Dọn công dân" },
@@ -93,6 +93,13 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "Số công dân sẽ bị xóa khi bấm **[Dọn công dân]**,\n\n" +
                   "dựa trên các ô đã chọn [ ✓ ]." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHousing)), "Nhà ở" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHousing)),
+                  "Số hộ hiện tại; cập nhật bằng [Làm mới số liệu].\n" +
+                  "<Đang tìm> = hộ có PropertySeeker được bật, gồm cả hộ vô gia cư.\n" +
+                  "<Chuyển vào/đi> = bộ đếm hộ của trò chơi 1.6.\n" +
+                  "PropertySeeker nghĩa là đang tìm, không phải tìm thất bại." },
 
                 // Status Cars
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "Ô tô" },
@@ -136,6 +143,7 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "Lỗi" },
                 { "CitizenCleaner/Status/Progress", "Đang dọn dẹp… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "Đang dọn… {0}" },
+                { "CitizenCleaner/Status/HousingRowV1", "{0} đang tìm | {1} đang chuyển vào | {2} đang chuyển đi" },
                 { "CitizenCleaner/Status/CarSummaryRowV2", "{0} hoạt động | {1} đang đỗ | {2} tổng | cập nhật {3}" },
                 { "CitizenCleaner/Status/CarParkingRowV2", "{0} đường phố | {1} cơ sở | {2} OC | {3} khác" },
                 { "CitizenCleaner/Status/OcHiddenOwnerRowV2",
@@ -152,14 +160,21 @@ namespace CitizenCleaner
                   "ValidCitizen là cờ dân số đã chuyển vào, không phải phép kiểm tra công dân lỗi của CC.\n" +
                   "Trò chơi đếm hộ đang chuyển đi và hộ người đi làm; CC đếm công dân." },
 
-                { "CitizenCleaner/Report/HomelessCheckHeading", "[KIỂM TRA ĐIỀU KIỆN NGƯỜI VÔ GIA CƯ]" },
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[ĐỐI CHIẾU DÂN SỐ VÔ GIA CƯ]" },
+                { "CitizenCleaner/Report/HouseholdHousingHeading", "[TRẠNG THÁI NHÀ Ở CỦA HỘ]" },
+                { "CitizenCleaner/Report/HouseholdHousingNote",
+                  "Các trạng thái này có thể chồng lên nhau. PropertySeeker nghĩa là đang tìm, không phải thất bại. Quy tắc công dân hỏng hiện tại của CC không loại trừ họ." },
+                { "CitizenCleaner/Report/NoRenterNotMovedInHouseholds",
+                  "Hộ không có PropertyRenter và chưa MovedIn" },
+                { "CitizenCleaner/Report/NoRenterPropertySeekerHouseholds",
+                  "Hộ không có PropertyRenter và đã bật PropertySeeker" },
                 { "CitizenCleaner/Report/GameCountsPending", "Số liệu trò chơi vẫn đang khởi tạo." },
                 { "CitizenCleaner/Report/CitizenIdsHeading", "[ID THỰC THỂ CÔNG DÂN — dùng Scene Explorer; Chỉ_mục:Phiên_bản]" },
                 { "CitizenCleaner/Report/CorruptCitizens", "Công dân lỗi" },
                 { "CitizenCleaner/Report/MovingAwayCitizens",
                   "Công dân đang chuyển đi (hộ có MovingAway + không có PropertyRenter)" },
                 { "CitizenCleaner/Report/CommuterCitizens", "Công dân đi làm" },
-                { "CitizenCleaner/Report/HomelessCitizens", "Công dân vô gia cư đủ điều kiện" },
+                { "CitizenCleaner/Report/HomelessCitizens", "Ứng viên vô gia cư để dọn" },
                 { "CitizenCleaner/Report/IdsLabel", "ID: " },
                 { "CitizenCleaner/Report/None", "(không có)" },
                 { "CitizenCleaner/Report/VehicleSnapshotUnavailable",

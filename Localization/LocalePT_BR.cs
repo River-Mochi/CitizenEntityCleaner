@@ -54,9 +54,9 @@ namespace CitizenCleaner
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.IncludeHomeless)), "▪ Sem-teto" },
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.IncludeHomeless)),
-                  "Conta e limpa cidadãos vivos marcados como **ValidCitizen + Homeless**.\n" +
-                  "Mortos, turistas, commuters e cidadãos sem ValidCitizen são excluídos.\n\n" +
-                  "<CUIDADO>: excluir pessoas sem-teto pode causar efeitos desconhecidos." },
+                  "Conta e limpa membros de **HomelessHousehold**.\n\n" +
+                  "Excluir pessoas sem-teto altera a população e a demanda residencial.\n" +
+                  "Mais famílias sem-teto reduzem a demanda geral, mas aumentam o fator positivo de alta densidade." },
 
                 // Buttons
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.CleanupEntitiesButton)), "Limpar cidadãos" },
@@ -93,6 +93,13 @@ namespace CitizenCleaner
                 { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.CorruptedCitizensDisplay)),
                   "Quantidade de entidades de cidadãos que serão removidas ao clicar em **[Limpar cidadãos]**,\n\n" +
                   "com base nas caixas selecionadas [ ✓ ]." },
+
+                { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusHousing)), "Moradia" },
+                { m_Setting.GetOptionDescLocaleID(nameof(CCSetting.StatusHousing)),
+                  "Contagens atuais de famílias; atualizadas com [Atualizar contagens].\n" +
+                  "<Procurando> = famílias com PropertySeeker ativado, incluindo famílias sem-teto.\n" +
+                  "<Chegando/saindo> = contadores de famílias do jogo 1.6.\n" +
+                  "PropertySeeker significa procura ativa, não uma busca que falhou." },
 
                 // Status Cars
                 { m_Setting.GetOptionLabelLocaleID(nameof(CCSetting.StatusCars)), "Carros" },
@@ -136,6 +143,7 @@ namespace CitizenCleaner
                 { "CitizenCleaner/Prompt/Error",  "Erro" },
                 { "CitizenCleaner/Status/Progress", "Limpeza em andamento… {0}" },
                 { "CitizenCleaner/Status/Cleaning", "Limpando… {0}" },
+                { "CitizenCleaner/Status/HousingRowV1", "{0} procurando | {1} chegando | {2} saindo" },
                 { "CitizenCleaner/Status/CarSummaryRowV2", "{0} ativos | {1} estacionados | {2} total | atualizado {3}" },
                 { "CitizenCleaner/Status/CarParkingRowV2", "{0} rua | {1} instalação | {2} OC | {3} outros" },
                 { "CitizenCleaner/Status/OcHiddenOwnerRowV2",
@@ -152,14 +160,21 @@ namespace CitizenCleaner
                   "ValidCitizen é uma marca de população que já se mudou para a cidade, não o teste de cidadãos corrompidos do CC.\n" +
                   "O jogo conta famílias de mudança e commuters; o CC conta cidadãos." },
 
-                { "CitizenCleaner/Report/HomelessCheckHeading", "[VERIFICAÇÃO DE ELEGIBILIDADE DOS SEM-TETO]" },
+                { "CitizenCleaner/Report/HomelessCheckHeading", "[COMPARAÇÃO DA POPULAÇÃO SEM-TETO]" },
+                { "CitizenCleaner/Report/HouseholdHousingHeading", "[ESTADOS DE MORADIA DAS FAMÍLIAS]" },
+                { "CitizenCleaner/Report/HouseholdHousingNote",
+                  "Esses estados podem se sobrepor. PropertySeeker significa busca, não falha. A regra atual de CC para cidadãos corrompidos não os exclui." },
+                { "CitizenCleaner/Report/NoRenterNotMovedInHouseholds",
+                  "Famílias sem PropertyRenter e sem MovedIn" },
+                { "CitizenCleaner/Report/NoRenterPropertySeekerHouseholds",
+                  "Famílias sem PropertyRenter e com PropertySeeker ativado" },
                 { "CitizenCleaner/Report/GameCountsPending", "As contagens do jogo ainda estão sendo inicializadas." },
                 { "CitizenCleaner/Report/CitizenIdsHeading",
                   "[IDS DE ENTIDADES DE CIDADÃOS — use Scene Explorer; Índice:Versão]" },
                 { "CitizenCleaner/Report/CorruptCitizens", "Cidadãos corrompidos" },
                 { "CitizenCleaner/Report/MovingAwayCitizens", "Cidadãos de mudança (família MovingAway + sem PropertyRenter)" },
                 { "CitizenCleaner/Report/CommuterCitizens", "Cidadãos commuters" },
-                { "CitizenCleaner/Report/HomelessCitizens", "Cidadãos sem-teto elegíveis" },
+                { "CitizenCleaner/Report/HomelessCitizens", "Candidatos sem-teto para limpeza" },
                 { "CitizenCleaner/Report/IdsLabel", "IDs: " },
                 { "CitizenCleaner/Report/None", "(nenhum)" },
                 { "CitizenCleaner/Report/VehicleSnapshotUnavailable",
